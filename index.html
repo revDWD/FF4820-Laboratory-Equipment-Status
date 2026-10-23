@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A situational-awareness view of laboratory equipment in FF4820.">
+  <meta name="theme-color" content="#f4f6f8">
+  <title>FF4820 Laboratory Equipment Status</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to equipment</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">FF</div>
+        <div>
+          <p class="eyebrow">Laboratory operations</p>
+          <h1>FF4820 <span>Laboratory Equipment Status</span></h1>
+        </div>
+      </div>
+      <div class="header-meta">
+        <span class="manual-data"><span aria-hidden="true">●</span> Manually maintained data</span>
+        <p id="data-updated">Data last updated: loading…</p>
+      </div>
+    </div>
+  </header>
+
+  <main id="main-content" class="page-shell">
+    <section class="summary-section" aria-labelledby="overview-heading">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Room overview</p>
+          <h2 id="overview-heading">Equipment at a glance</h2>
+        </div>
+        <p class="summary-caption">Counts include active inventory records only.</p>
+      </div>
+      <div class="summary-grid" id="summary-cards" aria-live="polite"></div>
+    </section>
+
+    <div class="notice" role="note">
+      <span class="notice-icon" aria-hidden="true">i</span>
+      <p>This dashboard supports laboratory situational awareness. Consult approved systems and procedures for official monitoring, alarm response, maintenance, and equipment records.</p>
+    </div>
+
+    <nav class="view-tabs" aria-label="Equipment views">
+      <button class="view-tab is-active" type="button" data-view="map" aria-current="page">Lab map</button>
+      <button class="view-tab" type="button" data-view="list">Equipment list</button>
+      <button class="view-tab" type="button" data-view="attention">Attention <span id="attention-tab-count" class="tab-count">0</span></button>
+    </nav>
+
+    <section class="view-panel" id="view-map" aria-labelledby="map-heading">
+      <div class="section-heading view-heading">
+        <div>
+          <p class="eyebrow">Room arrangement</p>
+          <h2 id="map-heading">Simplified equipment layout</h2>
+          <p class="muted">Approximate positions based on the room reference. Not an architectural floor plan.</p>
+        </div>
+        <div class="type-legend" aria-label="Equipment type styling">
+          <span><i class="type-dot incubator"></i>Incubator</span>
+          <span><i class="type-dot freezer"></i>Freezer</span>
+          <span><i class="type-dot refrigerator"></i>Refrigerator</span>
+        </div>
+      </div>
+      <div class="map-wrap">
+        <div class="map-canvas" id="map-canvas" aria-label="Equipment positioned by space number"></div>
+      </div>
+      <div class="map-mobile-list" id="map-mobile-list" aria-label="Equipment by space"></div>
+      <p class="map-footnote">Select any equipment tile for its source details and current status fields.</p>
+    </section>
+
+    <section class="view-panel" id="view-list" aria-labelledby="list-heading" hidden>
+      <div class="section-heading view-heading">
+        <div>
+          <p class="eyebrow">Inventory</p>
+          <h2 id="list-heading">Equipment list</h2>
+          <p class="muted">Search identifiers, purpose, program, space, PBC number, or REES input.</p>
+        </div>
+      </div>
+      <div class="filters" aria-label="Equipment list filters">
+        <label class="search-field">
+          <span>Search equipment</span>
+          <input id="search-input" type="search" placeholder="e.g. INC-120, Leps, space 4" autocomplete="off">
+        </label>
+        <label>
+          <span>Equipment type</span>
+          <select id="type-filter"><option value="">All types</option></select>
+        </label>
+        <label>
+          <span>Operational status</span>
+          <select id="status-filter"><option value="">All statuses</option></select>
+        </label>
+        <label>
+          <span>Monitoring status</span>
+          <select id="monitor-filter"><option value="">All monitoring</option></select>
+        </label>
+        <label>
+          <span>Sort by</span>
+          <select id="sort-filter">
+            <option value="space">Space number</option>
+            <option value="unit">Unit ID</option>
+            <option value="status">Operational status</option>
+            <option value="updated">Most recently updated</option>
+          </select>
+        </label>
+        <button class="button button-secondary unavailable-toggle" id="unavailable-toggle" type="button" aria-pressed="false">Show unavailable equipment</button>
+      </div>
+      <p class="results-count" id="results-count" aria-live="polite"></p>
+      <p class="visually-hidden" id="filter-announcement" aria-live="polite" aria-atomic="true"></p>
+      <div class="table-scroll">
+        <table class="equipment-table">
+          <caption class="visually-hidden">Equipment inventory and current status</caption>
+          <thead>
+            <tr>
+              <th scope="col">Unit ID</th><th scope="col">Space</th><th scope="col">Equipment type</th>
+              <th scope="col">Purpose / program</th><th scope="col">Operational status</th>
+              <th scope="col">Monitoring status</th><th scope="col">Temperature setpoint</th>
+              <th scope="col">Humidity setpoint</th><th scope="col">REES input</th>
+              <th scope="col">Date last reviewed</th><th scope="col"><span class="visually-hidden">Details</span></th>
+            </tr>
+          </thead>
+          <tbody id="equipment-table-body"></tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="list-empty" hidden>
+        <span aria-hidden="true">⌕</span><h3>No equipment matches</h3>
+        <p>Try another search or clear one or more filters.</p>
+        <button class="button button-secondary" id="clear-filters" type="button">Clear filters</button>
+      </div>
+    </section>
+
+    <section class="view-panel" id="view-attention" aria-labelledby="attention-heading" hidden>
+      <div class="section-heading view-heading">
+        <div>
+          <p class="eyebrow">Review queue</p>
+          <h2 id="attention-heading">Attention &amp; review</h2>
+          <p class="muted">Exceptions and records whose current status or monitoring state needs confirmation.</p>
+        </div>
+      </div>
+      <div class="attention-list" id="attention-list"></div>
+      <div class="empty-state" id="attention-empty" hidden>
+        <span aria-hidden="true">✓</span><h3>No current attention items</h3>
+        <p>No active records match the attention criteria.</p>
+      </div>
+    </section>
+
+    <section class="legend-panel" aria-labelledby="legend-heading">
+      <div class="legend-title">
+        <p class="eyebrow">Reading this dashboard</p>
+        <h2 id="legend-heading">Status &amp; data legend</h2>
+      </div>
+      <div class="legend-content">
+        <div><strong>Equipment type</strong><p>Type labels and restrained tile accents distinguish incubators, freezers, and refrigerators.</p></div>
+        <div><strong>Operational status</strong><p>Plain-language label and icon indicate a manually maintained status. Unknown means the source did not provide a confirmed current status.</p></div>
+        <div><strong>Monitoring status</strong><p>Shown separately from operational status. It is not a live REES connection or measurement.</p></div>
+        <div><strong>Last updated</strong><p>The most recent populated record review date. Blank dates are shown as “Not provided.”</p></div>
+        <div class="legend-wide"><strong>Setpoints are targets</strong><p>Temperature and humidity are target conditions from the equipment register, not current measured readings.</p></div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <span>Static dashboard · no live integrations</span>
+      <nav aria-label="Project documentation">
+        <a href="README.md">Owner &amp; deployment guide</a>
+        <a href="UPDATE_GUIDE.md">Update guide</a>
+        <a href="DATA_DICTIONARY.md">Data dictionary</a>
+        <a href="DATA_REVIEW.md">Data review</a>
+        <a href="INTEGRATION_NOTES.md">Integration notes</a>
+      </nav>
+    </footer>
+  </main>
+
+  <dialog class="detail-dialog" id="equipment-dialog" aria-labelledby="detail-title">
+    <div class="dialog-top">
+      <div>
+        <p class="eyebrow" id="detail-kicker">Equipment details</p>
+        <h2 id="detail-title">Equipment details</h2>
+      </div>
+      <button class="icon-button" id="detail-close" type="button" aria-label="Close equipment details">×</button>
+    </div>
+    <div id="detail-content" class="detail-content"></div>
+  </dialog>
+
+  <div class="loading-error" id="load-error" role="alert" hidden>
+    <div class="error-card">
+      <span class="error-symbol" aria-hidden="true">!</span>
+      <h2>Equipment data could not be loaded</h2>
+      <p id="load-error-message"></p>
+      <p>Check that <code>data/equipment.csv</code>, <code>data/config.json</code>, and <code>data/layout.json</code> are published with this page, then reload.</p>
+    </div>
+  </div>
+</body>
+</html>

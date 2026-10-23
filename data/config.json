@@ -1,0 +1,62 @@
+{
+  "operationalStatuses": [
+    "Operational",
+    "Attention Needed",
+    "Out of Service",
+    "Under Maintenance",
+    "Reserved",
+    "Temporarily Unavailable",
+    "Monitoring Disconnected",
+    "Retired",
+    "Unknown"
+  ],
+  "monitoringStatuses": [
+    "Connected",
+    "Alarm",
+    "Inhibited",
+    "Disconnected",
+    "Not Monitored",
+    "Unknown"
+  ],
+  "unavailableStatuses": [
+    "Out of Service",
+    "Under Maintenance",
+    "Reserved",
+    "Temporarily Unavailable"
+  ],
+  "attentionStatuses": [
+    "Out of Service",
+    "Under Maintenance",
+    "Attention Needed",
+    "Temporarily Unavailable",
+    "Monitoring Disconnected"
+  ],
+  "monitoringExceptions": [
+    "Alarm",
+    "Inhibited",
+    "Disconnected",
+    "Unknown"
+  ],
+  "csvFields": [
+    "spaceNumber",
+    "unitId",
+    "unitType",
+    "purpose",
+    "operationalStatus",
+    "monitoringStatus",
+    "temperatureSetpoint",
+    "humiditySetpoint",
+    "lightCycle",
+    "reesInput",
+    "pbcNumber",
+    "statusNote",
+    "dateReported",
+    "lastUpdated",
+    "updatedBy",
+    "nextAction",
+    "maintenanceReference",
+    "reesReference",
+    "displayOrder",
+    "active"
+  ]
+}
