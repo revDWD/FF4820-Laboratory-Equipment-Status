@@ -2,6 +2,8 @@
 
 A static, manually maintained equipment overview for the FF4820 laboratory. The dashboard is for situational awareness only; it is not a replacement for REES, Maintenance Connection, controlled equipment records, or approved alarm-response procedures.
 
+**Live dashboard:** [FF4820 Laboratory Equipment Status](https://revdwd.github.io/FF4820-Laboratory-Equipment-Status/)
+
 ## Architecture
 
 This first release uses semantic HTML, CSS, and vanilla JavaScript. GitHub Pages serves the site as static files; there is no server, database, browser-based editing, or external integration.
