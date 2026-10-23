@@ -52,12 +52,12 @@ It prints a diff and does not write a file unless `--output C:\path\to\candidate
 
 ## GitHub Pages deployment
 
-The repository contains one deployment method: [`.github/workflows/pages.yml`](.github/workflows/pages.yml), which validates the data and publishes the static site artifact using GitHub Actions.
+The repository contains one deployment method: [`.github/workflows/pages.yml`](.github/workflows/pages.yml), which validates the data and publishes the static site artifact using GitHub Actions. Its Pages configuration step attempts to enable the GitHub Actions Pages source automatically; if organization policy blocks this, a repository administrator must enable Pages in **Settings → Pages**.
 
 Before enabling Pages, confirm the repository visibility and intended audience with the repository/organization owner. The workbook-derived inventory includes internal equipment, space, PBC, and REES input identifiers; do not publish it to an audience that is not approved for those values.
 
 1. Push the project to the intended GitHub repository and default branch (`main` or `master`).
-2. In **Settings → Pages**, set the publishing source to **GitHub Actions**.
+2. In **Settings → Pages**, confirm the publishing source is **GitHub Actions** (the workflow also requests this setting when Pages is not yet initialized).
 3. Ensure repository or organization policy permits Pages and the workflow permissions `pages: write` and `id-token: write`.
 4. Push to `main`/`master`, or run the workflow manually from **Actions → Deploy static site to GitHub Pages → Run workflow**.
 5. Confirm the Actions run succeeds and open the Pages URL shown in the deployment job.
