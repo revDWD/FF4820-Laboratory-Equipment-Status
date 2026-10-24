@@ -16,6 +16,8 @@ class EquipmentDataValidationTests(unittest.TestCase):
         self.temp_dir = tempfile.TemporaryDirectory()
         self.root = Path(self.temp_dir.name)
         shutil.copytree(PROJECT_ROOT / "data", self.root / "data")
+        if (PROJECT_ROOT / "images").is_dir():
+            shutil.copytree(PROJECT_ROOT / "images", self.root / "images")
 
     def tearDown(self):
         self.temp_dir.cleanup()
@@ -71,6 +73,24 @@ class EquipmentDataValidationTests(unittest.TestCase):
         layout["equipment"] = [item for item in layout["equipment"] if item["unitId"] != "INC-120"]
         path.write_text(json.dumps(layout), encoding="utf-8")
         self.assertTrue(any("INC-120" in error and "no display position" in error for error in self.errors()))
+
+    def test_missing_map_background_is_reported(self):
+        (self.root / "images" / "ff4820-facility-map.png").unlink()
+        self.assertTrue(any("background.image: file not found" in error for error in self.errors()))
+
+    def test_absolute_map_background_path_is_reported(self):
+        path = self.root / "data" / "layout.json"
+        layout = json.loads(path.read_text(encoding="utf-8"))
+        layout["background"]["image"] = str(self.root / "images" / "ff4820-facility-map.png")
+        path.write_text(json.dumps(layout), encoding="utf-8")
+        self.assertTrue(any("background.image: image path must be relative" in error for error in self.errors()))
+
+    def test_map_background_dimensions_are_checked(self):
+        path = self.root / "data" / "layout.json"
+        layout = json.loads(path.read_text(encoding="utf-8"))
+        layout["background"]["width"] += 1
+        path.write_text(json.dumps(layout), encoding="utf-8")
+        self.assertTrue(any("background dimensions do not match" in error for error in self.errors()))
 
     def test_unsafe_reference_is_reported(self):
         fields, records = self.read_records()

@@ -134,7 +134,7 @@ function statusChip(value, monitoring = false) {
 
 function dataUpdatedLabel(records) {
   const dates = records.map((record) => cleanDate(record.lastUpdated)).filter(Boolean).sort();
-  return dates.length ? `Data last updated: ${dates[dates.length - 1]}` : "Data last updated: no review dates provided";
+  return dates.length ? `Most recent review: ${dates[dates.length - 1]}` : "Most recent review: no dates provided";
 }
 
 function needsReview(record) {
@@ -191,47 +191,100 @@ function equipmentById() {
   return new Map(equipment.map((record) => [record.unitId, record]));
 }
 
-function createEquipmentButton(record, compact = false) {
+function createEquipmentButton(record, position) {
   const button = document.createElement("button");
   button.type = "button";
-  button.className = compact ? "mobile-map-tile" : "map-tile";
-  button.classList.add(`type-${slug(record.unitType)}`);
-  if (record.operationalStatus === "Out of Service") button.classList.add("status-out-of-service");
-  button.setAttribute("aria-label", `${record.unitId}, space ${record.spaceNumber}, ${record.purpose}, ${record.operationalStatus}. Open details.`);
-  if (!compact) {
-    button.style.left = `${Math.min(Number(record.mapX) / 10, 92)}%`;
-    button.style.top = `${Math.min(Number(record.mapY) / 10, 80)}%`;
-  }
+  button.className = `map-marker type-${slug(record.unitType)} status-${slug(record.operationalStatus)}`;
+  button.classList.add(`monitor-${slug(record.monitoringStatus)}`);
+  button.dataset.unitId = record.unitId;
+  button.style.left = `${position.x / 10}%`;
+  button.style.top = `${position.y / 10}%`;
+  button.title = `${record.unitId} · Space ${record.spaceNumber} · Operational: ${record.operationalStatus} · Monitoring: ${record.monitoringStatus}`;
+  button.setAttribute(
+    "aria-label",
+    `${record.unitId}, space ${record.spaceNumber}, ${record.unitType}. Operational status: ${record.operationalStatus}. Monitoring status: ${record.monitoringStatus}. Open details.`
+  );
   const space = document.createElement("span");
-  space.className = "tile-space";
-  space.textContent = `Space ${record.spaceNumber}`;
+  space.className = "marker-space";
+  space.textContent = record.spaceNumber;
+  const operational = document.createElement("span");
+  operational.className = "marker-operational";
+  operational.setAttribute("aria-hidden", "true");
+  operational.textContent = STATUS_ICONS[record.operationalStatus] || "?";
+  const monitoring = document.createElement("span");
+  monitoring.className = "marker-monitoring";
+  monitoring.setAttribute("aria-hidden", "true");
+  monitoring.textContent = MONITOR_ICONS[record.monitoringStatus] || "?";
+  button.append(space, operational, monitoring);
+  button.addEventListener("click", () => openDetails(record, button));
+  return button;
+}
+
+function createMapIndexItem(record) {
+  const button = document.createElement("button");
+  button.className = "map-index-item";
+  button.type = "button";
+  button.dataset.unitId = record.unitId;
+  button.setAttribute("aria-label", `${record.unitId}, space ${record.spaceNumber}, ${record.unitType}. Operational: ${record.operationalStatus}. Monitoring: ${record.monitoringStatus}. Open details.`);
+
+  const location = document.createElement("span");
+  location.className = "map-index-location";
+  location.textContent = `SPACE ${record.spaceNumber} · ${record.unitType.toUpperCase()}`;
+
   const id = document.createElement("strong");
-  id.className = "tile-id";
+  id.className = "map-index-unit";
   id.textContent = record.unitId;
+
   const purpose = document.createElement("span");
-  purpose.className = "tile-purpose";
+  purpose.className = "map-index-purpose";
   purpose.textContent = record.purpose;
-  const status = statusChip(record.operationalStatus);
-  button.append(space, id, purpose, status);
+
+  const statuses = document.createElement("span");
+  statuses.className = "map-index-statuses";
+  statuses.append(statusChip(record.operationalStatus), statusChip(record.monitoringStatus, true));
+
+  button.append(location, id, purpose, statuses);
   button.addEventListener("click", () => openDetails(record, button));
   return button;
 }
 
 function renderMap() {
   const byId = equipmentById();
-  const canvas = $("#map-canvas");
-  const mobile = $("#map-mobile-list");
-  canvas.replaceChildren();
-  mobile.replaceChildren();
+  const markers = $("#map-markers");
+  const index = $("#map-equipment-list");
+  markers.replaceChildren();
+  index.replaceChildren();
   const activeLayout = layout.equipment.filter((position) => {
     const record = byId.get(position.unitId);
     return record && isActive(record);
   });
   for (const position of activeLayout) {
-    const record = { ...byId.get(position.unitId), mapX: position.x, mapY: position.y };
-    canvas.append(createEquipmentButton(record));
-    mobile.append(createEquipmentButton(record, true));
+    const record = byId.get(position.unitId);
+    markers.append(createEquipmentButton(record, position));
+    index.append(createMapIndexItem(record));
   }
+  $("#map-index-count").textContent = `${activeLayout.length} units`;
+  renderMapSearch();
+}
+
+function renderMapSearch() {
+  const query = $("#map-search").value.trim().toLowerCase();
+  let visibleCount = 0;
+  for (const item of $$(".map-index-item")) {
+    const record = equipment.find((entry) => entry.unitId === item.dataset.unitId);
+    const matches = !query || [
+      record.unitId,
+      record.spaceNumber,
+      record.unitType,
+      record.purpose
+    ].join(" ").toLowerCase().includes(query);
+    item.hidden = !matches;
+    const marker = $$(".map-marker").find((entry) => entry.dataset.unitId === record.unitId);
+    if (marker) marker.classList.toggle("is-muted", !matches);
+    if (matches) visibleCount += 1;
+  }
+  $("#map-index-count").textContent = `${visibleCount} of ${equipment.filter(isActive).length}`;
+  $("#map-index-empty").hidden = visibleCount > 0;
 }
 
 function formatDate(value) {
@@ -544,6 +597,7 @@ async function initialize() {
     fillFilters();
     renderTable();
     renderAttention();
+    $("#map-search").addEventListener("input", renderMapSearch);
     $("#detail-close").addEventListener("click", () => $("#equipment-dialog").close());
     $("#equipment-dialog").addEventListener("close", () => {
       if (returnFocus?.isConnected) returnFocus.focus();

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="A situational-awareness view of laboratory equipment in FF4820.">
-  <meta name="theme-color" content="#f4f6f8">
+  <meta name="theme-color" content="#0b1018">
   <title>FF4820 Laboratory Equipment Status</title>
   <link rel="stylesheet" href="styles.css">
   <script src="app.js" defer></script>
@@ -16,13 +16,13 @@
       <div class="brand">
         <div class="brand-mark" aria-hidden="true">FF</div>
         <div>
-          <p class="eyebrow">Laboratory operations</p>
-          <h1>FF4820 <span>Laboratory Equipment Status</span></h1>
+          <p class="eyebrow">Laboratory operations / facility 4820</p>
+          <h1>FF4820 <span>Equipment status</span></h1>
         </div>
       </div>
       <div class="header-meta">
-        <span class="manual-data"><span aria-hidden="true">●</span> Manually maintained data</span>
-        <p id="data-updated">Data last updated: loading…</p>
+        <span class="manual-data"><span aria-hidden="true">●</span> Manually maintained · not live</span>
+        <p id="data-updated">Most recent review: loading…</p>
       </div>
     </div>
   </header>
@@ -31,21 +31,21 @@
     <section class="summary-section" aria-labelledby="overview-heading">
       <div class="section-heading">
         <div>
-          <p class="eyebrow">Room overview</p>
-          <h2 id="overview-heading">Equipment at a glance</h2>
+          <p class="eyebrow">Facility overview</p>
+          <h2 id="overview-heading">Equipment status</h2>
         </div>
         <p class="summary-caption">Counts include active inventory records only.</p>
       </div>
-      <div class="summary-grid" id="summary-cards" aria-live="polite"></div>
+      <div class="summary-grid" id="summary-cards"></div>
     </section>
 
     <div class="notice" role="note">
       <span class="notice-icon" aria-hidden="true">i</span>
-      <p>This dashboard supports laboratory situational awareness. Consult approved systems and procedures for official monitoring, alarm response, maintenance, and equipment records.</p>
+      <p>Situational awareness only. Status is manually maintained and is not a live REES reading or alarm. Follow approved systems and procedures for monitoring, alarm response, maintenance, and equipment records.</p>
     </div>
 
     <nav class="view-tabs" aria-label="Equipment views">
-      <button class="view-tab is-active" type="button" data-view="map" aria-current="page">Lab map</button>
+      <button class="view-tab is-active" type="button" data-view="map" aria-current="page">Facility map</button>
       <button class="view-tab" type="button" data-view="list">Equipment list</button>
       <button class="view-tab" type="button" data-view="attention">Attention <span id="attention-tab-count" class="tab-count">0</span></button>
     </nav>
@@ -53,28 +53,63 @@
     <section class="view-panel" id="view-map" aria-labelledby="map-heading">
       <div class="section-heading view-heading">
         <div>
-          <p class="eyebrow">Room arrangement</p>
-          <h2 id="map-heading">Simplified equipment layout</h2>
-          <p class="muted">Approximate positions based on the room reference. Not an architectural floor plan.</p>
+          <p class="eyebrow">Physical locations / FF4820</p>
+          <h2 id="map-heading">FF4820 facility map</h2>
+          <p class="muted">Numbered positions follow the facility map in the equipment register. Spaces 30–32 appear in neighboring rooms on that source map.</p>
         </div>
-        <div class="type-legend" aria-label="Equipment type styling">
+        <div class="type-legend" aria-label="Map marker shape identifies equipment type">
           <span><i class="type-dot incubator"></i>Incubator</span>
           <span><i class="type-dot freezer"></i>Freezer</span>
           <span><i class="type-dot refrigerator"></i>Refrigerator</span>
         </div>
       </div>
-      <div class="map-wrap">
-        <div class="map-canvas" id="map-canvas" aria-label="Equipment positioned by space number"></div>
+      <div class="map-workspace">
+        <div class="map-column">
+          <div class="map-status-legend" aria-label="Map marker legend">
+            <span><i class="status-key status-key-operational" aria-hidden="true"></i>Operational</span>
+            <span><i class="status-key status-key-attention" aria-hidden="true"></i>Attention / maintenance</span>
+            <span><i class="status-key status-key-unavailable" aria-hidden="true"></i>Out of service</span>
+            <span><i class="status-key status-key-unknown" aria-hidden="true"></i>Unknown / retired</span>
+            <span><i class="status-key status-key-monitoring-connected" aria-hidden="true"></i>Monitoring connected</span>
+            <span><i class="status-key status-key-monitoring-exception" aria-hidden="true"></i>Monitoring exception</span>
+            <span><i class="status-key status-key-monitoring-unknown" aria-hidden="true"></i>Monitoring unknown</span>
+            <span><i class="status-key status-key-monitoring-none" aria-hidden="true"></i>Not monitored</span>
+            <span class="muted">Select a space marker for record details.</span>
+          </div>
+          <div class="map-wrap">
+            <div class="map-viewport" tabindex="0" aria-label="Scrollable facility map. All equipment is also available in the equipment index.">
+              <div class="map-canvas" id="map-canvas" role="group" aria-label="FF4820 facility map with equipment positions">
+                <img class="facility-map-image" src="images/ff4820-facility-map.png" alt="" draggable="false">
+                <div class="map-markers" id="map-markers"></div>
+              </div>
+            </div>
+          </div>
+          <p class="map-footnote">Map source: FF4820 Map.xlsx. Positions reflect numbered locations in that reference; verify location in the room before relying on it for navigation.</p>
+          <p class="map-footnote map-mobile-hint">On smaller screens, swipe the map horizontally or use the complete equipment index below it.</p>
+        </div>
+        <aside class="map-index" aria-labelledby="map-index-heading">
+          <div class="map-index-header">
+            <div>
+              <p class="eyebrow">Equipment index</p>
+              <h3 id="map-index-heading">Status by space</h3>
+            </div>
+            <span class="map-index-count" id="map-index-count"></span>
+          </div>
+          <label class="map-search">
+            <span class="visually-hidden">Search mapped equipment</span>
+            <input id="map-search" type="search" placeholder="Search unit or purpose" autocomplete="off">
+          </label>
+          <p class="map-index-empty" id="map-index-empty" hidden>No equipment matches this search.</p>
+          <div class="map-index-list" id="map-equipment-list" aria-label="Mapped equipment and status"></div>
+        </aside>
       </div>
-      <div class="map-mobile-list" id="map-mobile-list" aria-label="Equipment by space"></div>
-      <p class="map-footnote">Select any equipment tile for its source details and current status fields.</p>
     </section>
 
     <section class="view-panel" id="view-list" aria-labelledby="list-heading" hidden>
       <div class="section-heading view-heading">
         <div>
           <p class="eyebrow">Inventory</p>
-          <h2 id="list-heading">Equipment list</h2>
+          <h2 id="list-heading">All equipment</h2>
           <p class="muted">Search identifiers, purpose, program, space, PBC number, or REES input.</p>
         </div>
       </div>
@@ -187,7 +222,7 @@
       <span class="error-symbol" aria-hidden="true">!</span>
       <h2>Equipment data could not be loaded</h2>
       <p id="load-error-message"></p>
-      <p>Check that <code>data/equipment.csv</code>, <code>data/config.json</code>, and <code>data/layout.json</code> are published with this page, then reload.</p>
+      <p>Check that <code>data/equipment.csv</code>, <code>data/config.json</code>, <code>data/layout.json</code>, and the facility-map image are published with this page, then reload.</p>
     </div>
   </div>
 </body>

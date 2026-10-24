@@ -10,7 +10,7 @@ Before publishing, confirm that repository visibility and audience are approved 
 
 - `data/equipment.csv` is the editable runtime inventory. The primary source was `FF4820 Map.xlsx`; all 32 current workbook records were migrated.
 - `data/config.json` contains the controlled status vocabularies and CSV field order.
-- `data/layout.json` contains editable, normalized room-map positions. The approximate arrangement comes from the historic `Incubation Room.pptx`; it is not an architectural drawing.
+- `data/layout.json` contains editable normalized marker centers digitized from the numbered facility map embedded in `FF4820 Map.xlsx`. `images/ff4820-facility-map.png` is the published map background. The historic `Incubation Room.pptx` is a visual cross-reference, not a source of current status or equipment assignments.
 - Excel takes precedence for current equipment attributes. Do not use old slide assignments to overwrite Excel values or infer current status.
 - Operational status and monitoring status are separate controlled values. Never infer either from purpose, a setpoint, historical slide text, or missing data.
 - Initial status and monitoring status are `Unknown` because the source workbook does not provide them. Blank incident dates, update owners, next actions, and references are intentional. Do not invent them.
@@ -23,7 +23,7 @@ The app uses semantic HTML, CSS, and dependency-free browser JavaScript. `app.js
 
 `StaticEquipmentProvider` and `StaticStatusProvider` load local published data. REES and Maintenance Connection provider placeholders are disabled and must not make network calls. Any future connector needs explicit audience, security, source-of-truth, access, and read-only approvals; keep the static experience useful without integrations.
 
-Maintain the existing three views: simplified map, searchable/filterable equipment list, and attention queue. Keep summary counts data-derived. Preserve keyboard access, visible focus, status text plus icon and styling, tablet/mobile list layout, reduced-motion support, useful loading errors, and print styles.
+Maintain the existing three views: facility map, searchable/filterable equipment list, and attention queue. Keep summary counts data-derived. Show separate operational and monitoring status indicators on map markers and readable status labels in the equipment index. Preserve keyboard access, visible focus, status text plus icon and styling, tablet/mobile list access, reduced-motion support, useful loading errors, and print styles.
 
 ## Safe data updates
 
@@ -31,7 +31,7 @@ Maintain the existing three views: simplified map, searchable/filterable equipme
 - Use only approved status vocabulary from `data/config.json`.
 - Dates are ISO `YYYY-MM-DD`. Leave optional fields empty when not supplied.
 - Keep the CSV header and order aligned with `csvFields`; quote values containing commas.
-- Active unit IDs must each have a unique map position in `data/layout.json`, matching the equipment `spaceNumber`.
+- Active unit IDs must each have a map position in `data/layout.json`, matching the equipment `spaceNumber`. The source groups spaces 19 and 20, so their separate interactive markers are intentionally offset within that shared source-map label.
 - Active space numbers must be unique unless an owner confirms sharing. Only then add the confirmed value to `allowedSharedSpaceNumbers` in `data/config.json`.
 - Do not silently overwrite status fields or notes when importing workbook inventory changes. The optional `scripts/import_excel.py` prints a review diff and only writes to an explicitly named separate candidate file.
 - Avoid committing credentials, tokens, internal session data, confidential endpoints, or unapproved personal data.
@@ -60,4 +60,4 @@ The workflow is configured for pushes to `main` or `master` and manual dispatch.
 
 When editing, inspect current files and preserve unrelated changes. Validate the exact behavior changed. Browser-check status propagation across map, list, attention, summary, and detail; verify desktop tiles do not overlap, mobile/tablet have no horizontal overflow, and list/attention print views remain usable.
 
-The current migration intentionally leaves unresolved: all current operational/monitoring statuses and update dates; missing PBC for `FRZ-365`; Excel notes whose scope is unclear; unusual REES labels `N4 52` and `N4 5`; legacy PowerPoint assignment disagreements; and approximate physical positions. See `DATA_REVIEW.md` rather than guessing.
+The current migration intentionally leaves unresolved: all current operational/monitoring statuses and update dates; missing PBC for `FRZ-365`; Excel notes whose scope is unclear; unusual REES labels `N4 52` and `N4 5`; legacy PowerPoint assignment disagreements; and whether the digitized map positions still match current physical locations. See `DATA_REVIEW.md` rather than guessing.

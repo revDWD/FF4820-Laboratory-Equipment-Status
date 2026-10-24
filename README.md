@@ -10,12 +10,13 @@ This first release uses semantic HTML, CSS, and vanilla JavaScript. GitHub Pages
 
 - `data/equipment.csv` is the editable equipment register.
 - `data/config.json` controls approved operational and monitoring vocabularies.
-- `data/layout.json` holds editable simplified map coordinates.
+- `data/layout.json` holds editable equipment positions digitized from the numbered facility map embedded in `FF4820 Map.xlsx`.
+- `images/ff4820-facility-map.png` is the facility-map image used beneath the interactive equipment markers.
 - `app.js` loads and renders those files using relative URLs, so a repository subpath works.
-- `scripts/validate_data.py` checks controlled values, required fields, duplicates, dates, URLs, and map coverage.
+- `scripts/validate_data.py` checks controlled values, required fields, duplicates, dates, URLs, map coverage, and the background image's PNG dimensions.
 - `scripts/import_excel.py` is an optional, explicit, review-first utility for an approved `.xlsx` register. It is never run by the site or deployment.
 
-Current equipment attributes were migrated from **FF4820 Map.xlsx**. The historic PowerPoint was used only as a visual reference for the approximate equipment arrangement. Differences and information requiring confirmation are listed in [DATA_REVIEW.md](DATA_REVIEW.md).
+Current equipment attributes were migrated from **FF4820 Map.xlsx**. Its embedded facility map is the background for the facility-first view; the numbered positions were digitized for clickable status markers. The historic PowerPoint remains a visual cross-reference, not a source of current status or equipment assignments. Map locations should be confirmed in the room before relying on them for navigation. Differences and information requiring confirmation are listed in [DATA_REVIEW.md](DATA_REVIEW.md).
 
 ## Update one unit
 
@@ -30,7 +31,7 @@ For the exact field rules and safe merge-conflict steps, see [UPDATE_GUIDE.md](U
 
 ## Add equipment or adjust the map
 
-Add a complete row to `data/equipment.csv` using the existing header, assign a unique `unitId`, and use `Unknown` for unconfirmed status fields. Then add its `unitId`, matching `spaceNumber`, and normalized `x`/`y` values to `data/layout.json`. Read the detailed guides in [UPDATE_GUIDE.md](UPDATE_GUIDE.md), then run the validator.
+Add a complete row to `data/equipment.csv` using the existing header, assign a unique `unitId`, and use `Unknown` for unconfirmed status fields. Then add its `unitId`, matching `spaceNumber`, and normalized `x`/`y` values to `data/layout.json`, centered on the corresponding numbered position in the facility-map image. Read the detailed guides in [UPDATE_GUIDE.md](UPDATE_GUIDE.md), then run the validator.
 
 ## Local preview and checks
 
@@ -56,7 +57,7 @@ It prints a diff and does not write a file unless `--output C:\path\to\candidate
 
 The repository contains one deployment method: [`.github/workflows/pages.yml`](.github/workflows/pages.yml), which validates the data and publishes the static site artifact using GitHub Actions. A repository administrator must initialize Pages in **Settings → Pages** and select **GitHub Actions** before the first successful deployment.
 
-Before enabling Pages, confirm the repository visibility and intended audience with the repository/organization owner. The workbook-derived inventory includes internal equipment, space, PBC, and REES input identifiers; do not publish it to an audience that is not approved for those values.
+Before enabling Pages, confirm the repository visibility and intended audience with the repository/organization owner. The workbook-derived inventory and facility map include internal equipment, room, PBC, and REES input identifiers; do not publish them to an audience that is not approved for those values.
 
 1. Push the project to the intended GitHub repository and default branch (`main` or `master`).
 2. In **Settings → Pages**, set the publishing source to **GitHub Actions** and save. This first-time repository setting cannot be initialized by the workflow token.
@@ -64,14 +65,14 @@ Before enabling Pages, confirm the repository visibility and intended audience w
 4. Push to `main`/`master`, or run the workflow manually from **Actions → Deploy static site to GitHub Pages → Run workflow**.
 5. Confirm the Actions run succeeds and open the Pages URL shown in the deployment job.
 
-The site uses relative file references and is suitable for a repository subpath. The workflow copies the app entry point, styles, script, data, and linked owner documentation into the published artifact.
+The site uses relative file references and is suitable for a repository subpath. The workflow copies the app entry point, styles, script, facility map image, data, and linked owner documentation into the published artifact.
 
 ### Deployment troubleshooting
 
 - **Blank page:** Open browser developer tools and inspect the network request for `app.js`; confirm the deployment job completed and refresh without a cached page.
 - **404 error:** Check the Pages URL and repository name; the repository name is part of the URL for project Pages.
 - **CSS not loading:** Confirm `styles.css` is included in the artifact and that the deployed HTML requests the relative `styles.css` path.
-- **Data file not loading:** Check that `data/equipment.csv`, `data/config.json`, and `data/layout.json` exist in the Pages artifact and load successfully beneath the repository path.
+- **Data or facility map not loading:** Check that `data/equipment.csv`, `data/config.json`, `data/layout.json`, and `images/ff4820-facility-map.png` exist in the Pages artifact and load successfully beneath the repository path.
 - **Incorrect repository base path:** Keep app references relative (`styles.css`, `app.js`, `data/...`); do not change them to `/...` root paths.
 - **GitHub Pages disabled by organization policy:** Ask the GitHub organization owner to enable Pages for the repository or approve an alternative host.
 - **Pages build blocked by repository permissions:** Ask a repository administrator to enable Actions, Pages deployment, and the workflow permissions noted above; also check organization Actions policy.

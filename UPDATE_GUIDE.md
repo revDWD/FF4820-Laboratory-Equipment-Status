@@ -26,13 +26,13 @@ Example: to report a confirmed unit as out of service, update its one row's `ope
 1. Confirm the new unit in the approved inventory source and gather its exact Unit ID, space, type, and available attributes.
 2. Add a CSV row with all 20 columns in the existing header order. Use an empty field for unavailable optional information and `Unknown` for unconfirmed operational or monitoring status.
 3. Set a unique `displayOrder` and `active=true` if it belongs in the active inventory. Do not set `Operational` by default.
-4. Add an entry to `data/layout.json` with the exact `unitId`, same `spaceNumber`, and approximate integer `x`/`y` coordinates from 0 to 1000. The map is deliberately editable and not an architectural drawing.
+4. Add an entry to `data/layout.json` with the exact `unitId`, same `spaceNumber`, and approximate integer `x`/`y` coordinates from 0 to 1000. These are normalized coordinates on the supplied facility-map image; place the marker at the center of the corresponding numbered location. The map is not an architectural drawing.
 5. Run the validator and inspect the local preview before committing.
 
 ## How to move equipment on the map
 
 1. Open `data/layout.json` and find the unit's `unitId`.
-2. Edit `x` and `y` only. Coordinates are normalized from 0 (top/left) to 1000 (bottom/right). The browser converts them to map percentages.
+2. Edit `x` and `y` only. Coordinates are normalized from 0 (top/left) to 1000 (bottom/right) on the facility-map image. Place the marker at the center of the numbered location and verify its physical placement in the room; the source is not surveyed.
 3. Do not change the equipment's physical `spaceNumber` in the layout without changing the matching approved CSV data as well.
 4. Run `py -3 scripts\validate_data.py`, then inspect the local preview at desktop and tablet sizes.
 

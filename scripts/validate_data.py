@@ -8,7 +8,7 @@ import re
 import sys
 from collections import defaultdict
 from datetime import date
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from urllib.parse import urlsplit
 
 
@@ -31,6 +31,45 @@ def read_json(path):
         return json.load(handle)
 
 
+def validate_map_background(root, layout, errors):
+    background = layout.get("background")
+    if not isinstance(background, dict):
+        errors.append("data/layout.json background: expected an image and its dimensions.")
+        return
+
+    image = background.get("image")
+    if not isinstance(image, str) or not image.strip():
+        errors.append("data/layout.json background.image: a relative image path is required.")
+        return
+    if PurePosixPath(image).is_absolute() or PureWindowsPath(image).is_absolute():
+        errors.append("data/layout.json background.image: image path must be relative.")
+        return
+
+    image_path = (root / image).resolve()
+    try:
+        image_path.relative_to(root.resolve())
+    except ValueError:
+        errors.append("data/layout.json background.image: image path must stay inside the project.")
+        return
+    try:
+        contents = image_path.read_bytes()
+    except OSError:
+        errors.append(f"data/layout.json background.image: file not found: {image}.")
+        return
+
+    if len(contents) < 24 or contents[:8] != b"\x89PNG\r\n\x1a\n":
+        errors.append(f"data/layout.json background.image: expected a PNG image: {image}.")
+        return
+
+    width = int.from_bytes(contents[16:20], "big")
+    height = int.from_bytes(contents[20:24], "big")
+    if background.get("width") != width or background.get("height") != height:
+        errors.append(
+            "data/layout.json background dimensions do not match "
+            f"{image} ({width} x {height})."
+        )
+
+
 def validate_project(root):
     root = Path(root)
     errors = []
@@ -40,6 +79,8 @@ def validate_project(root):
         layout = read_json(data_dir / "layout.json")
     except (OSError, json.JSONDecodeError) as error:
         return [f"Project configuration: {error}"], 0
+
+    validate_map_background(root, layout, errors)
 
     fields = config.get("csvFields", [])
     with (data_dir / "equipment.csv").open(encoding="utf-8-sig", newline="") as handle:

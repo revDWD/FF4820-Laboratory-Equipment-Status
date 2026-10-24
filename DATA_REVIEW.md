@@ -50,8 +50,8 @@ Slide 1 groups the purpose text for `INC-112` and `INC-113` visually; the workbo
 - Humidity `0.6`, `0.7`, `0.75`, and `0.8` are retained exactly; no units or percentage interpretation was added.
 - Temperature values are shown as setpoints and not as measured or live values.
 
-## Simplified layout
+## Facility map and layout
 
-The map uses approximate positions from the room arrangement on slide 1, with the space numbers associated using the older numbered room map on slide 3. Three records not drawn as unit tiles in slide 1 (`FRZ-282`, `FRZ-281`, `REFG-116`) were positioned approximately at their numbered spaces from slide 3. `INC-112` and `INC-113` were separated into selectable tiles because the Excel workbook provides two records. These are editable layout approximations, not verified architectural coordinates.
+The facility-first map background is the numbered plan embedded in `FF4820 Map.xlsx` (1024 × 576 pixels). `data/layout.json` stores normalized marker centers digitized from its numbered equipment locations. The map includes spaces 30–32 in neighboring rooms, as shown in the source image; those positions are not silently moved into FF4820. Spaces 19 and 20 are shown together as `19/20` on the source plan, so their interactive markers are offset slightly within that shared map label to keep both records selectable.
 
-Please confirm approximate placements in the live room before relying on the map for navigation.
+`Incubation Room.pptx` remains a historic visual reference and helps explain older arrangement/assignment differences above; it was not used to set current statuses or replace the workbook map. The digitized positions reproduce the source map, but the source does not establish surveyed coordinates or guarantee present-day placement. Confirm locations in the room before relying on the map for navigation.
