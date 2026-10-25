@@ -4,8 +4,8 @@ This report records information gaps and differences found while migrating **FF4
 
 ## Review required before operational use
 
-1. **Current operational status is absent.** The workbook has no operational-status column. All 32 rows therefore start at `Unknown`; this does not mean all units are unavailable or operating normally.
-2. **Current monitoring status is absent.** The workbook has REES input labels but no connection, alarm, inhibited, or current monitoring state. All 32 rows start at `Unknown`.
+1. **Current operational status was supplied by the owner, not the workbook.** The workbook has no status column. The owner confirmed units are operating, so 31 are `Operational`; INC-120 (purpose `OOO`) stays `Unknown`.
+2. **Monitoring status is inferred.** Units with a REES input are `Connected`; FRZ-282 has none and is `Not Monitored`. Confirm against REES.
 3. **Incident information is absent.** Current notes, date reported, last reviewed date, updated-by owner, next action, maintenance references, REES references, and status history are not present in the approved workbook fields. Those cells remain blank; `statusNote` states only that a current status was not provided in the source.
 4. **PBC number is missing for `FRZ-365`** (space 24). The value is left blank, not inferred.
 5. **Excel-only notes need an owner to place them.** The source worksheet has additional notes outside the listed equipment columns: `CS-STL-SOP-1002 section 4.1.7` near `I1601` and `Humidity = ± 10%` near `INC-90`. They were not mapped to an equipment field because their intended meaning and scope are not explicit. Confirm whether these belong in a controlled reference or equipment record.

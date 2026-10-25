@@ -79,6 +79,6 @@ The site uses relative file references and is suitable for a repository subpath.
 
 ## Data meaning and integrations
 
-All current workbook rows are included in the inventory. The workbook does not provide current operational or monitoring status, so all migrated records start as `Unknown`; their generic status note is a migration prompt, not a recorded incident. A date is blank unless it was supplied. See [DATA_DICTIONARY.md](DATA_DICTIONARY.md), [DATA_REVIEW.md](DATA_REVIEW.md), and [INTEGRATION_NOTES.md](INTEGRATION_NOTES.md).
+All current workbook rows are included in the inventory. The owner confirmed the units are operating, so all are `Operational` except INC-120 (register purpose `OOO`), which stays `Unknown` until confirmed. Species labels are expanded from register abbreviations and should be confirmed by the owner. Release history is in [CHANGELOG.md](CHANGELOG.md). See [DATA_DICTIONARY.md](DATA_DICTIONARY.md), [DATA_REVIEW.md](DATA_REVIEW.md), and [INTEGRATION_NOTES.md](INTEGRATION_NOTES.md).
 
 The dashboard displays register setpoints as **targets**, never as live measurements. No credentials, enterprise endpoints, or integration requests are included. Future integration boundaries remain disabled placeholders.

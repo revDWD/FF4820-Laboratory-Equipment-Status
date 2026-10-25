@@ -42,12 +42,12 @@ const cleanDate = (value) => value && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value 
 const slug = (value) => String(value).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
 const TONES = [
-  { id: "green", label: "Available" },
-  { id: "blue", label: "Reserved / in use" },
-  { id: "yellow", label: "Attention" },
-  { id: "orange", label: "Limited" },
-  { id: "red", label: "Unavailable" },
-  { id: "neutral", label: "Not confirmed" }
+  { id: "green", label: "Available", hint: "Operational and ready to use" },
+  { id: "blue", label: "Reserved / in use", hint: "Reserved or currently in use" },
+  { id: "yellow", label: "Attention", hint: "Maintenance scheduled, inspection required, or attention needed" },
+  { id: "orange", label: "Limited", hint: "Calibration due, limited availability, or monitoring disconnected" },
+  { id: "red", label: "Unavailable", hint: "Out of service, under maintenance, or temporarily unavailable" },
+  { id: "neutral", label: "Not confirmed", hint: "No confirmed status; never assumed available" }
 ];
 const toneLabel = (tone) => TONES.find((entry) => entry.id === tone)?.label || "Not confirmed";
 const toneOf = (status) => config?.statusTones?.[status] || "neutral";
@@ -123,16 +123,54 @@ function statusChip(value, monitoring = false) {
   return chip;
 }
 
-function dataUpdatedLabel(records) {
-  const dates = records.map((record) => cleanDate(record.lastUpdated)).filter(Boolean).sort();
-  return dates.length ? `Most recent review: ${dates[dates.length - 1]}` : "Most recent review: no dates provided";
+const SVG_NS = "http://www.w3.org/2000/svg";
+const ICONS = {
+  lepidoptera: ["M12 8v11", "M12 10C9 4 3 4 3 9c0 4 4 5 9 3", "M12 10c3-6 9-6 9-1 0 4-4 5-9 3", "M12 8 10 5M12 8l2-3"],
+  coleoptera: ["M12 8c-3 0-5 2.5-5 6s2 6 5 6 5-2.5 5-6-2-6-5-6z", "M9.5 7.5C10 5.5 14 5.5 14.5 7.5", "M12 8v12", "M7 12H4M7 15.5H4M17 12h3M17 15.5h3M7.5 18.5 5 20.5M16.5 18.5l2.5 2"],
+  hemiptera: ["M12 6l6 3v5c0 3.5-3 5.5-6 6.5-3-1-6-3-6-6.5V9z", "M12 9v11", "M10 6 8 3.5M14 6l2-2.5"],
+  mixed: ["M4.5 12a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0-3 0M10.5 12a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0-3 0M16.5 12a1.5 1.5 0 1 0 3 0a1.5 1.5 0 1 0-3 0"],
+  storage: ["M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9"],
+  empty: ["M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16z"],
+  unspecified: ["M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16z", "M8.5 12h7"],
+  temperature: ["M10 14.5V5a2 2 0 0 1 4 0v9.5a4 4 0 1 1-4 0z"],
+  humidity: ["M12 3s6 6.5 6 11a6 6 0 1 1-12 0c0-4.5 6-11 6-11z"],
+  light: ["M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zM12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"],
+  location: ["M12 21s-6-5.5-6-10a6 6 0 1 1 12 0c0 4.5-6 10-6 10z", "M12 8.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"]
+};
+
+function icon(name) {
+  const svg = document.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("class", `icon icon-${name}`);
+  svg.setAttribute("aria-hidden", "true");
+  for (const d of ICONS[name] || ICONS.unspecified) {
+    const path = document.createElementNS(SVG_NS, "path");
+    path.setAttribute("d", d);
+    svg.append(path);
+  }
+  return svg;
 }
 
-function needsReview(record) {
-  return record.operationalStatus === "Unknown" ||
-    record.monitoringStatus === "Unknown" ||
-    !cleanDate(record.lastUpdated) ||
-    !record.pbcNumber;
+function speciesLabel(record) {
+  return record.species || record.purpose;
+}
+
+function humidityLabel(value) {
+  const number = Number.parseFloat(value);
+  if (!Number.isNaN(number) && number > 0 && number <= 1) return `${Math.round(number * 100)}% RH`;
+  return /^(n\/a|)$/i.test(value) ? "" : value;
+}
+
+function lightLabel(value) {
+  if (/^(n\/a|)$/i.test(value)) return "";
+  const match = value.match(/^(\d+)\s*(?:L)?\s*:\s*(\d+)\s*(?:D|L:D)$/i);
+  if (match) {
+    const [light, dark] = [Number(match[1]), Number(match[2])];
+    if (light === 0) return "Constant dark";
+    if (dark === 0) return "Constant light";
+    return `${light} h light / ${dark} h dark`;
+  }
+  return /^24\s*D$/i.test(value) ? "Constant dark" : value;
 }
 
 function attentionReason(record) {
@@ -154,19 +192,22 @@ function renderReadiness(records) {
   $("#readiness-summary").replaceChildren();
   const headline = document.createElement("strong");
   headline.textContent = `${available} of ${active.length} available`;
-  const detail = document.createElement("span");
-  detail.textContent = unconfirmed === active.length
-    ? "Current status not yet confirmed for any unit"
-    : unconfirmed ? `${unconfirmed} not confirmed` : "All statuses confirmed";
-  $("#readiness-summary").append(headline, detail);
+  $("#readiness-summary").append(headline);
+  if (unconfirmed) {
+    const detail = document.createElement("span");
+    detail.textContent = `${unconfirmed} not confirmed`;
+    $("#readiness-summary").append(detail);
+  }
 
   const group = $("#status-filters");
   group.replaceChildren();
   for (const tone of TONES) {
+    if (tone.id === "neutral" && !counts.get(tone.id)) continue;
     const button = document.createElement("button");
     button.type = "button";
     button.className = `status-filter tone-${tone.id}`;
     button.dataset.tone = tone.id;
+    button.title = tone.hint;
     button.setAttribute("aria-pressed", String(activeTones.has(tone.id)));
     const dot = document.createElement("span");
     dot.className = "status-dot";
@@ -186,7 +227,6 @@ function renderReadiness(records) {
     });
     group.append(button);
   }
-  $("#data-updated").textContent = dataUpdatedLabel(active);
 }
 
 function equipmentById() {
@@ -205,7 +245,7 @@ function createEquipmentButton(record, position) {
   button.style.top = `${position.y / 10}%`;
   button.setAttribute(
     "aria-label",
-    `${record.unitId}, space ${record.spaceNumber}, ${record.unitType}. ${toneLabel(tone)}: ${record.operationalStatus}. Monitoring: ${record.monitoringStatus}. Open details.`
+    `${record.unitId}, space ${record.spaceNumber}, ${record.unitType}. ${speciesLabel(record)}. ${toneLabel(tone)}: ${record.operationalStatus}. Monitoring: ${record.monitoringStatus}. Open details.`
   );
   const space = document.createElement("span");
   space.className = "marker-space";
@@ -225,25 +265,31 @@ function createEquipmentButton(record, position) {
 function showPopup(record, position) {
   const popup = $("#map-popup");
   const tone = toneOf(record.operationalStatus);
+  const head = document.createElement("div");
+  head.className = "popup-head";
+  const glyph = document.createElement("span");
+  glyph.className = "popup-glyph";
+  glyph.append(icon(record.speciesGroup));
   const title = document.createElement("strong");
   title.className = "popup-title";
   title.textContent = record.unitId;
   const meta = document.createElement("span");
   meta.className = "popup-meta";
-  meta.textContent = `Space ${record.spaceNumber} · ${record.unitType} · ${text(record.purpose)}`;
+  meta.textContent = `${record.unitType} · Space ${record.spaceNumber}`;
+  const heading = document.createElement("span");
+  heading.className = "popup-heading";
+  heading.append(title, meta);
+  head.append(glyph, heading);
+  const species = document.createElement("span");
+  species.className = "popup-species";
+  species.textContent = speciesLabel(record);
   const availability = document.createElement("span");
   availability.className = `popup-availability tone-${tone}`;
-  availability.textContent = toneLabel(tone);
-  const statuses = document.createElement("span");
-  statuses.className = "popup-statuses";
-  statuses.append(statusChip(record.operationalStatus), statusChip(record.monitoringStatus, true));
-  const reviewed = document.createElement("span");
-  reviewed.className = "popup-meta";
-  reviewed.textContent = `Last reviewed: ${formatDate(record.lastUpdated)}`;
-  const hint = document.createElement("span");
-  hint.className = "popup-hint";
-  hint.textContent = "Select for full details";
-  popup.replaceChildren(title, meta, availability, statuses, reviewed, hint);
+  const dot = document.createElement("span");
+  dot.className = "status-dot";
+  dot.setAttribute("aria-hidden", "true");
+  availability.append(dot, `${toneLabel(tone)} · ${record.operationalStatus}`);
+  popup.replaceChildren(head, species, availability);
   const horizontal = position.x > 780 ? "-100%" : position.x < 140 ? "-12%" : "-50%";
   const below = position.y < 330;
   popup.style.left = `${position.x / 10}%`;
@@ -275,7 +321,7 @@ function applyMapFilters() {
   for (const marker of markers) {
     const record = byId.get(marker.dataset.unitId);
     const toneMatch = !activeTones.size || activeTones.has(marker.dataset.tone);
-    const textMatch = !query || [record.unitId, record.spaceNumber, record.unitType, record.purpose, record.operationalStatus]
+    const textMatch = !query || [record.unitId, record.spaceNumber, record.unitType, record.purpose, record.species, record.operationalStatus]
       .join(" ").toLowerCase().includes(query);
     const matched = toneMatch && textMatch;
     marker.classList.toggle("is-muted", !matched);
@@ -313,7 +359,7 @@ function filteredRecords() {
     if (unavailableOnly && !config.unavailableStatuses.includes(record.operationalStatus)) return false;
     if (search) {
       const searchable = [
-        record.unitId, record.purpose, record.spaceNumber, record.pbcNumber, record.reesInput,
+        record.unitId, record.purpose, record.species, record.spaceNumber, record.pbcNumber, record.reesInput,
         record.unitType, record.operationalStatus, record.monitoringStatus
       ].join(" ").toLowerCase();
       if (!searchable.includes(search)) return false;
@@ -356,6 +402,7 @@ function renderTable() {
       tableCell("Unit ID", "", idButton),
       tableCell("Space", record.spaceNumber),
       tableCell("Equipment type", record.unitType),
+      tableCell("Species", record.species || "—"),
       tableCell("Purpose / program", record.purpose),
       tableCell("Operational status", "", statusChip(record.operationalStatus)),
       tableCell("Monitoring status", "", statusChip(record.monitoringStatus, true)),
@@ -422,63 +469,105 @@ function appendReference(container, label, value) {
   container.append(wrapper);
 }
 
-function addDetailSection(root, title, fields) {
-  const section = document.createElement("section");
-  section.className = "detail-section";
-  const heading = document.createElement("h3");
-  heading.textContent = title;
-  const grid = document.createElement("dl");
-  grid.className = "detail-grid";
-  for (const [label, value, wide] of fields) grid.append(makeField(label, value, wide));
-  section.append(heading, grid);
-  root.append(section);
-  return grid;
+function conditionTile(iconName, label, value) {
+  const tile = document.createElement("div");
+  tile.className = "condition";
+  const head = document.createElement("dt");
+  head.append(icon(iconName), label);
+  const body = document.createElement("dd");
+  body.textContent = value;
+  tile.append(head, body);
+  return tile;
 }
 
 function openDetails(record, trigger) {
   returnFocus = trigger;
-  $("#equipment-dialog").classList.toggle("is-out-of-service", toneOf(record.operationalStatus) === "red");
-  $("#detail-title").textContent = record.unitId;
-  $("#detail-kicker").textContent = `${record.unitType} · Space ${record.spaceNumber}`;
+  const tone = toneOf(record.operationalStatus);
+  const dialog = $("#equipment-dialog");
+  dialog.className = `detail-dialog tone-${tone}`;
   const content = $("#detail-content");
   content.replaceChildren();
-  const statusRow = document.createElement("div");
-  statusRow.className = "detail-status-row";
-  statusRow.append(statusChip(record.operationalStatus), statusChip(record.monitoringStatus, true));
-  content.append(statusRow);
 
-  addDetailSection(content, "Equipment information", [
-    ["Unit ID", record.unitId],
-    ["Equipment type", record.unitType],
-    ["Space number", record.spaceNumber],
-    ["Purpose / program", record.purpose],
-    ["Temperature target / setpoint", record.temperatureSetpoint],
-    ["Humidity target / setpoint", record.humiditySetpoint],
-    ["Light cycle", record.lightCycle],
-    ["REES input reference", record.reesInput],
-    ["PBC number", record.pbcNumber]
-  ]);
-  const setpointNote = document.createElement("p");
-  setpointNote.className = "setpoint-notice";
-  setpointNote.textContent = "Setpoints are target conditions from the equipment register, not live measurements.";
-  content.append(setpointNote);
+  const hero = document.createElement("header");
+  hero.className = "detail-hero";
+  const glyph = document.createElement("div");
+  glyph.className = "detail-glyph";
+  glyph.append(icon(record.speciesGroup));
+  const heading = document.createElement("div");
+  const where = document.createElement("p");
+  where.className = "detail-where";
+  where.append(icon("location"), `${record.unitType} · Space ${record.spaceNumber}`);
+  const title = document.createElement("h2");
+  title.id = "detail-title";
+  title.textContent = record.unitId;
+  const statuses = document.createElement("div");
+  statuses.className = "detail-status-row";
+  statuses.append(statusChip(record.operationalStatus), statusChip(record.monitoringStatus, true));
+  heading.append(where, title, statuses);
+  hero.append(glyph, heading);
+  content.append(hero);
 
-  const currentGrid = addDetailSection(content, "Current status information", [
-    ["Operational status", record.operationalStatus],
-    ["Monitoring status", record.monitoringStatus],
-    ["Date reported", formatDate(record.dateReported)],
-    ["Last updated", formatDate(record.lastUpdated)],
-    ["Updated by", record.updatedBy],
-    ["Current note", record.statusNote, true],
-    ["Next action", record.nextAction, true]
-  ]);
-  appendReference(currentGrid, "Maintenance Connection reference", record.maintenanceReference);
-  appendReference(currentGrid, "REES reference", record.reesReference);
-  const historyGrid = addDetailSection(content, "Status history", [
-    ["History", "Not provided in the source data.", true]
-  ]);
-  historyGrid.setAttribute("aria-label", "Status history fields");
-  if (!$("#equipment-dialog").open) $("#equipment-dialog").showModal();
+  const species = document.createElement("section");
+  species.className = "detail-species";
+  const speciesTitle = document.createElement("p");
+  speciesTitle.className = "detail-label";
+  speciesTitle.textContent = record.species ? "Test species" : "Purpose";
+  const speciesName = document.createElement("p");
+  speciesName.className = "detail-species-name";
+  speciesName.textContent = speciesLabel(record);
+  species.append(speciesTitle, speciesName);
+  if (record.species && record.purpose && record.purpose !== record.species) {
+    const purpose = document.createElement("p");
+    purpose.className = "detail-purpose";
+    purpose.textContent = record.purpose;
+    species.append(purpose);
+  }
+  content.append(species);
+
+  const conditions = [
+    ["temperature", "Temperature", record.temperatureSetpoint],
+    ["humidity", "Humidity", humidityLabel(record.humiditySetpoint)],
+    ["light", "Light cycle", lightLabel(record.lightCycle)]
+  ].filter(([, , value]) => value);
+  if (conditions.length) {
+    const grid = document.createElement("dl");
+    grid.className = "conditions";
+    grid.setAttribute("aria-label", "Target conditions");
+    for (const [name, label, value] of conditions) grid.append(conditionTile(name, label, value));
+    content.append(grid);
+  }
+
+  if (record.statusNote || record.nextAction) {
+    const notes = document.createElement("section");
+    notes.className = "detail-notes";
+    if (record.statusNote) {
+      const note = document.createElement("p");
+      note.textContent = record.statusNote;
+      notes.append(note);
+    }
+    if (record.nextAction) {
+      const next = document.createElement("p");
+      const strong = document.createElement("strong");
+      strong.textContent = "Next: ";
+      next.append(strong, record.nextAction);
+      notes.append(next);
+    }
+    content.append(notes);
+  }
+
+  const records = document.createElement("dl");
+  records.className = "detail-records";
+  const entries = [
+    ["PBC", record.pbcNumber],
+    ["REES input", record.reesInput],
+    ["Status entered", [formatDate(record.lastUpdated), record.updatedBy].filter((part) => part && part !== "Not provided").join(" · ")]
+  ];
+  for (const [label, value] of entries) if (value) records.append(makeField(label, value));
+  if (record.maintenanceReference) appendReference(records, "Maintenance Connection", record.maintenanceReference);
+  if (record.reesReference) appendReference(records, "REES", record.reesReference);
+  content.append(records);
+
+  if (!dialog.open) dialog.showModal();
   $("#detail-close").focus();
 }
 
@@ -590,6 +679,8 @@ async function initialize() {
     config = loadedConfig;
     layout = loadedLayout;
     validateLoadedData();
+    $("#app-version").textContent = config.version;
+    $("#app-version").parentElement.title = config.versionName;
     renderReadiness(equipment);
     renderMap();
     fillFilters();

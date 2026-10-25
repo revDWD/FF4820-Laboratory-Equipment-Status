@@ -33,7 +33,7 @@ jobs:
       - name: Build Pages artifact
         run: |
           mkdir -p _site/data _site/images
-          cp index.html styles.css app.js README.md DATA_DICTIONARY.md DATA_REVIEW.md UPDATE_GUIDE.md INTEGRATION_NOTES.md _site/
+          cp index.html styles.css app.js README.md CHANGELOG.md DATA_DICTIONARY.md DATA_REVIEW.md UPDATE_GUIDE.md INTEGRATION_NOTES.md _site/
           cp data/equipment.csv data/config.json data/layout.json _site/data/
           cp images/ff4820-facility-map.png _site/images/
       - name: Upload Pages artifact

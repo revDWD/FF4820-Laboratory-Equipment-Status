@@ -99,6 +99,19 @@ class EquipmentDataValidationTests(unittest.TestCase):
         path.write_text(json.dumps(config), encoding="utf-8")
         self.assertTrue(any("Calibration Due" in error and "statusTones" in error for error in self.errors()))
 
+    def test_unknown_species_group_is_reported(self):
+        fields, records = self.read_records()
+        records[0]["speciesGroup"] = "spiders"
+        self.write_records(fields, records)
+        self.assertTrue(any("INC-120" in error and "speciesGroup" in error for error in self.errors()))
+
+    def test_invalid_version_is_reported(self):
+        path = self.root / "data" / "config.json"
+        config = json.loads(path.read_text(encoding="utf-8"))
+        config["version"] = "v1.2"
+        path.write_text(json.dumps(config), encoding="utf-8")
+        self.assertTrue(any("semantic version" in error for error in self.errors()))
+
     def test_unsafe_reference_is_reported(self):
         fields, records = self.read_records()
         records[0]["reesReference"] = "javascript:alert(1)"

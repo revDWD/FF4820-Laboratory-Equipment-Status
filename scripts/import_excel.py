@@ -124,6 +124,7 @@ def merge_register(source_records, current_records, fields):
             target.update({
                 "operationalStatus": "Unknown",
                 "monitoringStatus": "Unknown",
+                "speciesGroup": "unspecified",
                 "statusNote": NEW_STATUS_NOTE,
                 "displayOrder": str(display_order),
                 "active": "true",

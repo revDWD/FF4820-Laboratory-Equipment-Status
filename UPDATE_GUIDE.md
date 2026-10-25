@@ -21,11 +21,15 @@ The site is a static view of files in the repository. Browser interactions do no
 
 Example: to report a confirmed unit as out of service, update its one row's `operationalStatus` to `Out of Service`, add an accurate `statusNote`, and fill date/owner/action fields only when known. Never change temperature setpoint to represent a measured reading.
 
+## Releasing a user-visible change
+
+Add a bullet to `Unreleased` in `CHANGELOG.md`. When publishing, rename it to the new version and date and update `version` and `versionName` in `data/config.json`. Status-only CSV edits do not need a version bump.
+
 ## How to add new equipment
 
 1. Confirm the new unit in the approved inventory source and gather its exact Unit ID, space, type, and available attributes.
-2. Add a CSV row with all 20 columns in the existing header order. Use an empty field for unavailable optional information and `Unknown` for unconfirmed operational or monitoring status.
-3. Set a unique `displayOrder` and `active=true` if it belongs in the active inventory. Do not set `Operational` by default.
+2. Add a CSV row with all 22 columns in the existing header order, including `species` and `speciesGroup` (see DATA_DICTIONARY.md). Use an empty field for unavailable optional information and `Unknown` for unconfirmed status.
+3. Set a unique `displayOrder` and `active=true` if it belongs in the active inventory. Use `Operational` only when the unit is confirmed available.
 4. Add an entry to `data/layout.json` with the exact `unitId`, same `spaceNumber`, and approximate integer `x`/`y` coordinates from 0 to 1000. These are normalized coordinates on the supplied facility-map image; place the marker at the center of the corresponding numbered location. The map is not an architectural drawing.
 5. Run the validator and inspect the local preview before committing.
 

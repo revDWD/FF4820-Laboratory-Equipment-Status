@@ -1,4 +1,15 @@
 {
+  "version": "1.2.0",
+  "versionName": "UX Refinement Release",
+  "speciesGroups": {
+    "lepidoptera": "Lepidoptera",
+    "coleoptera": "Beetles",
+    "hemiptera": "True bugs",
+    "mixed": "Multiple species",
+    "storage": "Storage",
+    "empty": "Empty",
+    "unspecified": "Unspecified"
+  },
   "operationalStatuses": [
     "Operational",
     "In Use",
@@ -68,6 +79,8 @@
     "unitId",
     "unitType",
     "purpose",
+    "species",
+    "speciesGroup",
     "operationalStatus",
     "monitoringStatus",
     "temperatureSetpoint",
