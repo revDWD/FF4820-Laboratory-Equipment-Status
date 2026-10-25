@@ -13,7 +13,9 @@ Before publishing, confirm that repository visibility and audience are approved 
 - `data/layout.json` contains editable normalized marker centers digitized from the numbered facility map embedded in `FF4820 Map.xlsx`. `images/ff4820-facility-map.png` is the published map background. The historic `Incubation Room.pptx` is a visual cross-reference, not a source of current status or equipment assignments.
 - Excel takes precedence for current equipment attributes. Do not use old slide assignments to overwrite Excel values or infer current status.
 - Operational status and monitoring status are separate controlled values. Never infer either from purpose, a setpoint, historical slide text, or missing data.
-- Initial status and monitoring status are `Unknown` because the source workbook does not provide them. Blank incident dates, update owners, next actions, and references are intentional. Do not invent them.
+- Units are `Operational` per owner confirmation; INC-120 remains `Unknown`. Do not invent incident dates, owners, next actions, or references. Species values are owner-confirmable inferences from register abbreviations.
+- Keep the map first under the header; do not reintroduce a situational-awareness banner, equipment index, "?" marker glyph, or "About this data" panel. "Manually maintained" lives only in the header pill.
+- User-visible changes need a `CHANGELOG.md` entry and, when released, a semver bump in `data/config.json`.
 - Setpoints are target conditions, never live readings. REES input is a monitoring reference, not a permanent equipment identifier.
 - `DATA_REVIEW.md` records source discrepancies, missing values, historical labels, unmapped workbook notes, and map assumptions. Keep it current when reviewed or corrected.
 

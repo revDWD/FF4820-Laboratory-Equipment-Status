@@ -87,6 +87,8 @@ def validate_project(root):
             errors.append(f"data/config.json statusTones: no valid color tone for operational status {status!r}.")
 
     fields = config.get("csvFields", [])
+    if not re.fullmatch(r"\d+\.\d+\.\d+", str(config.get("version", ""))):
+        errors.append("data/config.json version: expected a semantic version such as 1.2.0.")
     with (data_dir / "equipment.csv").open(encoding="utf-8-sig", newline="") as handle:
         reader = csv.DictReader(handle, strict=True)
         headers = reader.fieldnames or []
@@ -136,6 +138,9 @@ def validate_project(root):
         op_status = row.get("operationalStatus", "").strip()
         if op_status and op_status not in config.get("operationalStatuses", []):
             errors.append(f"{display_name} (CSV row {row_number}), field operationalStatus: unapproved value {op_status!r}.")
+        species_group = row.get("speciesGroup", "").strip()
+        if species_group not in config.get("speciesGroups", {}):
+            errors.append(f"{display_name} (CSV row {row_number}), field speciesGroup: unapproved value {species_group!r}.")
         monitor_status = row.get("monitoringStatus", "").strip()
         if monitor_status and monitor_status not in config.get("monitoringStatuses", []):
             errors.append(f"{display_name} (CSV row {row_number}), field monitoringStatus: unapproved value {monitor_status!r}.")

@@ -10,6 +10,8 @@ The editable source is `data/equipment.csv`. Keep the header names and order unc
 | `unitId` | Yes | Exact equipment Unit ID. Must be unique. |
 | `unitType` | Yes | `Incubator`, `Freezer`, or `Refrigerator`. |
 | `purpose` | Yes | Purpose/program as recorded in the workbook. |
+| `species` | No | Insect species or program associated with the unit, shown on the map hover card and detail card. Leave blank for storage units and units without a stated species. |
+| `speciesGroup` | Yes | Icon family for the species: `lepidoptera`, `coleoptera`, `hemiptera`, `mixed`, `storage`, `empty`, or `unspecified` (see `speciesGroups` in `data/config.json`). |
 | `operationalStatus` | Yes | One value from the operational vocabulary below. Never infer it. |
 | `monitoringStatus` | Yes | One value from the monitoring vocabulary below. Never infer it. |
 | `temperatureSetpoint` | No | Target temperature from the register (for example `25°C`); not a live measurement. |
@@ -19,7 +21,7 @@ The editable source is `data/equipment.csv`. Keep the header names and order unc
 | `pbcNumber` | No | PBC number as text, preserving leading digits. |
 | `statusNote` | No | Current human-maintained status note, if provided. |
 | `dateReported` | No | Date a status item was reported, ISO `YYYY-MM-DD`. |
-| `lastUpdated` | No | Date this row's status information was last reviewed, ISO `YYYY-MM-DD`. This drives the header's “Data last updated” value. |
+| `lastUpdated` | No | Date this row's status information was last reviewed, ISO `YYYY-MM-DD`. Shown on the detail card as "Status entered". |
 | `updatedBy` | No | Person who made the status update, if provided and appropriate for the audience. |
 | `nextAction` | No | Confirmed next action only; leave blank when none is supplied. |
 | `maintenanceReference` | No | Approved Maintenance Connection reference or URL. Plain asset references are allowed; URLs must use HTTP or HTTPS and contain no credentials. |
@@ -43,11 +45,11 @@ Keep operational status and monitoring status separate. `Unknown` means the appr
 
 ## Sample equipment record
 
-The first inventory record is a sample using source attributes and explicitly unconfirmed status. It is a real migrated source row, not fabricated equipment. Its initial current-status note is a migration prompt.
+The first inventory record is a real source row whose availability is still unconfirmed. Its note is a human prompt, not a recorded incident.
 
 ```csv
-spaceNumber,unitId,unitType,purpose,operationalStatus,monitoringStatus,temperatureSetpoint,humiditySetpoint,lightCycle,reesInput,pbcNumber,statusNote,dateReported,lastUpdated,updatedBy,nextAction,maintenanceReference,reesReference,displayOrder,active
-1,INC-120,Incubator,OOO,Unknown,Unknown,25°C,0.7,0 L : 24 D,97 T/98 RH,300000000408253,Current status not provided in source.,,,,,,,1,true
+spaceNumber,unitId,unitType,purpose,species,speciesGroup,operationalStatus,monitoringStatus,temperatureSetpoint,humiditySetpoint,lightCycle,reesInput,pbcNumber,statusNote,dateReported,lastUpdated,updatedBy,nextAction,maintenanceReference,reesReference,displayOrder,active
+1,INC-120,Incubator,OOO,,unspecified,Unknown,Connected,25°C,0.7,0 L : 24 D,97 T/98 RH,300000000408253,Purpose is listed as OOO in the register; confirm availability.,,2026-10-25,DWD,Confirm availability,,,1,true
 ```
 
 ## Data presentation rules

@@ -1,33 +1,33 @@
-spaceNumber,unitId,unitType,purpose,operationalStatus,monitoringStatus,temperatureSetpoint,humiditySetpoint,lightCycle,reesInput,pbcNumber,statusNote,dateReported,lastUpdated,updatedBy,nextAction,maintenanceReference,reesReference,displayOrder,active
-1,INC-120,Incubator,OOO,Unknown,Unknown,25°C,0.7,0 L : 24 D,97 T/98 RH,300000000408253,Current status not provided in source.,,,,,,,1,true
-2,I2377,Incubator,Leps,Unknown,Unknown,27°C,0.6,14 L : 10 D,99 T/100 RH,300000000259755,Current status not provided in source.,,,,,,,2,true
-3,I1601,Incubator,Empty,Unknown,Unknown,25°C,Ambient,24 D,102 T/101 RH,300000000258178,Current status not provided in source.,,,,,,,3,true
-4,I840,Incubator,Tribolium,Unknown,Unknown,30°C,0.75,24 D,103 T/104 RH,300000000258005,Current status not provided in source.,,,,,,,4,true
-5,I1383,Incubator,PWA,Unknown,Unknown,25°C,0.7,14:10 L:D,95 T/96 RH,300000000258248,Current status not provided in source.,,,,,,,5,true
-6,INC-92,Incubator,Leps,Unknown,Unknown,27°C,0.6,14 L : 10 D,93 T/94 RH,300000000302707,Current status not provided in source.,,,,,,,6,true
-7,INC-94,Incubator,Leps,Unknown,Unknown,27°C,0.6,14 L : 10 D,91 T/92 RH,300000000302709,Current status not provided in source.,,,,,,,7,true
-8,INC-93,Incubator,Leps,Unknown,Unknown,27°C,0.6,14 L : 10 D,89 T/90 RH,300000000302708,Current status not provided in source.,,,,,,,8,true
-9,INC-84,Incubator,Leps,Unknown,Unknown,27°C,0.6,14 L : 10 D,87 T/88 RH,300000000292621,Current status not provided in source.,,,,,,,9,true
-10,INC-90,Incubator,SCR,Unknown,Unknown,27°C,0.7,24 D,77 T/78 RH,300000000293243,Current status not provided in source.,,,,,,,10,true
-11,INC-71,Incubator,GLW Bioassay,Unknown,Unknown,25°C,0.8,16:8 L:D,79 T/80 RH,300000000270559,Current status not provided in source.,,,,,,,11,true
-12,INC-63,Incubator,Leps,Unknown,Unknown,27°C,0.6,14:10 L:D,81 T/82 RH,300000000269198,Current status not provided in source.,,,,,,,12,true
-13,I3413,Incubator,Rootworm Handling,Unknown,Unknown,25°C,0.7,0:24 L:D,83 T/84 RH,300000000262593,Current status not provided in source.,,,,,,,13,true
-14,I3213,Incubator,NBSB Rearing and Handling,Unknown,Unknown,27°C,0.7,16:8 L:D,85 T/86 RH,300000000262594,Current status not provided in source.,,,,,,,14,true
-15,FRZ-220,Freezer,Sample Storage- working freezer,Unknown,Unknown,-80°C,n/a,n/a,73 T,300000000270682,Current status not provided in source.,,,,,,,15,true
-16,F3584,Freezer,Sample Storage - working freezer,Unknown,Unknown,-80°C,n/a,n/a,74 T,300000000270687,Current status not provided in source.,,,,,,,16,true
-17,F3212,Freezer,Disposal Weekday,Unknown,Unknown,-20°C,n/a,n/a,75 T,300000000270691,Current status not provided in source.,,,,,,,17,true
-18,FRZ-248,Freezer,Disposal Weekday,Unknown,Unknown,-20°C,n/a,n/a,76 T,300000000276171,Current status not provided in source.,,,,,,,18,true
-19,INC-112,Incubator,WCR Assays,Unknown,Unknown,25°C,0.7,24 D,111 / 112,300000000324668,Current status not provided in source.,,,,,,,19,true
-20,INC-113,Incubator,"WTP, CPB, MBB Receiving",Unknown,Unknown,15°C,0.7,24 D,115 / 116,300000000324669,Current status not provided in source.,,,,,,,20,true
-21,FRZ-343,Refrigerator,Buffer/Chemical Storage,Unknown,Unknown,4°C,n/a,n/a,120,300000000325915,Current status not provided in source.,,,,,,,21,true
-22,FRZ-335,Freezer,Sample Storage- long term storage,Unknown,Unknown,-80°C,n/a,n/a,118,300000000324073,Current status not provided in source.,,,,,,,22,true
-23,FRZ-342,Freezer,Sample Storage- half working and DC samples,Unknown,Unknown,-80°C,n/a,n/a,119,300000000337788,Current status not provided in source.,,,,,,,23,true
-24,FRZ-365,Freezer,Sample Storage,Unknown,Unknown,-80°C,n/a,n/a,71,,Current status not provided in source.,,,,,,,24,true
-25,I1112,Incubator,Lep/Rootworm Receiving,Unknown,Unknown,10°C,Ambient,24 D,108 T,300000000257794,Current status not provided in source.,,,,,,,25,true
-26,FRZ-352,Freezer,Preventative Maintenance freezer,Unknown,Unknown,-80°C,n/a,n/a,128 T,300000000376617,Current status not provided in source.,,,,,,,26,true
-27,FRZ-353,Freezer,Sample Storage- working freezer,Unknown,Unknown,-80°C,n/a,n/a,107 T,300000000376618,Current status not provided in source.,,,,,,,27,true
-28,INC-111,Incubator,Leps,Unknown,Unknown,27°C,0.6,14 L : 10 D,109 T/110 RH,300000000322542,Current status not provided in source.,,,,,,,28,true
-29,R2192,Refrigerator,Buffer/Chem Storage,Unknown,Unknown,4°C,n/a,n/a,72 T,300000000260786,Current status not provided in source.,,,,,,,29,true
-30,FRZ-282,Freezer,REG ERA sample storage,Unknown,Unknown,-20°C,n/a,n/a,n/a,300000000325787,Current status not provided in source.,,,,,,,30,true
-31,FRZ-281,Freezer,Chemical/Diet Storage,Unknown,Unknown,-20°C,n/a,n/a,N4 52,300000000325788,Current status not provided in source.,,,,,,,31,true
-32,REFG-116,Refrigerator,Chemical/Diet Storage,Unknown,Unknown,4°C,n/a,n/a,N4 5,300000000411739,Current status not provided in source.,,,,,,,32,true
+spaceNumber,unitId,unitType,purpose,species,speciesGroup,operationalStatus,monitoringStatus,temperatureSetpoint,humiditySetpoint,lightCycle,reesInput,pbcNumber,statusNote,dateReported,lastUpdated,updatedBy,nextAction,maintenanceReference,reesReference,displayOrder,active
+1,INC-120,Incubator,OOO,,unspecified,Unknown,Connected,25°C,0.7,0 L : 24 D,97 T/98 RH,300000000408253,"Purpose is listed as OOO in the register; confirm availability.",,2026-10-25,DWD,Confirm availability,,,1,true
+2,I2377,Incubator,Leps,Lepidoptera,lepidoptera,Operational,Connected,27°C,0.6,14 L : 10 D,99 T/100 RH,300000000259755,,,2026-10-25,DWD,,,,2,true
+3,I1601,Incubator,Empty,,empty,Operational,Connected,25°C,Ambient,24 D,102 T/101 RH,300000000258178,,,2026-10-25,DWD,,,,3,true
+4,I840,Incubator,Tribolium,Tribolium (flour beetle),coleoptera,Operational,Connected,30°C,0.75,24 D,103 T/104 RH,300000000258005,,,2026-10-25,DWD,,,,4,true
+5,I1383,Incubator,PWA,PWA,unspecified,Operational,Connected,25°C,0.7,14:10 L:D,95 T/96 RH,300000000258248,,,2026-10-25,DWD,,,,5,true
+6,INC-92,Incubator,Leps,Lepidoptera,lepidoptera,Operational,Connected,27°C,0.6,14 L : 10 D,93 T/94 RH,300000000302707,,,2026-10-25,DWD,,,,6,true
+7,INC-94,Incubator,Leps,Lepidoptera,lepidoptera,Operational,Connected,27°C,0.6,14 L : 10 D,91 T/92 RH,300000000302709,,,2026-10-25,DWD,,,,7,true
+8,INC-93,Incubator,Leps,Lepidoptera,lepidoptera,Operational,Connected,27°C,0.6,14 L : 10 D,89 T/90 RH,300000000302708,,,2026-10-25,DWD,,,,8,true
+9,INC-84,Incubator,Leps,Lepidoptera,lepidoptera,Operational,Connected,27°C,0.6,14 L : 10 D,87 T/88 RH,300000000292621,,,2026-10-25,DWD,,,,9,true
+10,INC-90,Incubator,SCR,Southern corn rootworm (SCR),coleoptera,Operational,Connected,27°C,0.7,24 D,77 T/78 RH,300000000293243,,,2026-10-25,DWD,,,,10,true
+11,INC-71,Incubator,GLW Bioassay,GLW,unspecified,Operational,Connected,25°C,0.8,16:8 L:D,79 T/80 RH,300000000270559,,,2026-10-25,DWD,,,,11,true
+12,INC-63,Incubator,Leps,Lepidoptera,lepidoptera,Operational,Connected,27°C,0.6,14:10 L:D,81 T/82 RH,300000000269198,,,2026-10-25,DWD,,,,12,true
+13,I3413,Incubator,Rootworm Handling,Rootworm,coleoptera,Operational,Connected,25°C,0.7,0:24 L:D,83 T/84 RH,300000000262593,,,2026-10-25,DWD,,,,13,true
+14,I3213,Incubator,NBSB Rearing and Handling,Neotropical brown stink bug (NBSB),hemiptera,Operational,Connected,27°C,0.7,16:8 L:D,85 T/86 RH,300000000262594,,,2026-10-25,DWD,,,,14,true
+15,FRZ-220,Freezer,Sample Storage- working freezer,,storage,Operational,Connected,-80°C,n/a,n/a,73 T,300000000270682,,,2026-10-25,DWD,,,,15,true
+16,F3584,Freezer,Sample Storage - working freezer,,storage,Operational,Connected,-80°C,n/a,n/a,74 T,300000000270687,,,2026-10-25,DWD,,,,16,true
+17,F3212,Freezer,Disposal Weekday,,storage,Operational,Connected,-20°C,n/a,n/a,75 T,300000000270691,,,2026-10-25,DWD,,,,17,true
+18,FRZ-248,Freezer,Disposal Weekday,,storage,Operational,Connected,-20°C,n/a,n/a,76 T,300000000276171,,,2026-10-25,DWD,,,,18,true
+19,INC-112,Incubator,WCR Assays,Western corn rootworm (WCR),coleoptera,Operational,Connected,25°C,0.7,24 D,111 / 112,300000000324668,,,2026-10-25,DWD,,,,19,true
+20,INC-113,Incubator,"WTP, CPB, MBB Receiving","WTP, CPB, MBB",mixed,Operational,Connected,15°C,0.7,24 D,115 / 116,300000000324669,,,2026-10-25,DWD,,,,20,true
+21,FRZ-343,Refrigerator,Buffer/Chemical Storage,,storage,Operational,Connected,4°C,n/a,n/a,120,300000000325915,,,2026-10-25,DWD,,,,21,true
+22,FRZ-335,Freezer,Sample Storage- long term storage,,storage,Operational,Connected,-80°C,n/a,n/a,118,300000000324073,,,2026-10-25,DWD,,,,22,true
+23,FRZ-342,Freezer,Sample Storage- half working and DC samples,,storage,Operational,Connected,-80°C,n/a,n/a,119,300000000337788,,,2026-10-25,DWD,,,,23,true
+24,FRZ-365,Freezer,Sample Storage,,storage,Operational,Connected,-80°C,n/a,n/a,71,,,,2026-10-25,DWD,,,,24,true
+25,I1112,Incubator,Lep/Rootworm Receiving,"Lepidoptera, rootworm",mixed,Operational,Connected,10°C,Ambient,24 D,108 T,300000000257794,,,2026-10-25,DWD,,,,25,true
+26,FRZ-352,Freezer,Preventative Maintenance freezer,,storage,Operational,Connected,-80°C,n/a,n/a,128 T,300000000376617,,,2026-10-25,DWD,,,,26,true
+27,FRZ-353,Freezer,Sample Storage- working freezer,,storage,Operational,Connected,-80°C,n/a,n/a,107 T,300000000376618,,,2026-10-25,DWD,,,,27,true
+28,INC-111,Incubator,Leps,Lepidoptera,lepidoptera,Operational,Connected,27°C,0.6,14 L : 10 D,109 T/110 RH,300000000322542,,,2026-10-25,DWD,,,,28,true
+29,R2192,Refrigerator,Buffer/Chem Storage,,storage,Operational,Connected,4°C,n/a,n/a,72 T,300000000260786,,,2026-10-25,DWD,,,,29,true
+30,FRZ-282,Freezer,REG ERA sample storage,,storage,Operational,Not Monitored,-20°C,n/a,n/a,n/a,300000000325787,,,2026-10-25,DWD,,,,30,true
+31,FRZ-281,Freezer,Chemical/Diet Storage,,storage,Operational,Connected,-20°C,n/a,n/a,N4 52,300000000325788,,,2026-10-25,DWD,,,,31,true
+32,REFG-116,Refrigerator,Chemical/Diet Storage,,storage,Operational,Connected,4°C,n/a,n/a,N4 5,300000000411739,,,2026-10-25,DWD,,,,32,true
