@@ -81,6 +81,10 @@ def validate_project(root):
         return [f"Project configuration: {error}"], 0
 
     validate_map_background(root, layout, errors)
+    tones = config.get("statusTones", {})
+    for status in config.get("operationalStatuses", []):
+        if tones.get(status) not in {"green", "blue", "yellow", "orange", "red", "neutral"}:
+            errors.append(f"data/config.json statusTones: no valid color tone for operational status {status!r}.")
 
     fields = config.get("csvFields", [])
     with (data_dir / "equipment.csv").open(encoding="utf-8-sig", newline="") as handle:

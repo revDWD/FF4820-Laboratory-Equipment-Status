@@ -20,88 +20,45 @@
           <h1>FF4820 <span>Equipment status</span></h1>
         </div>
       </div>
+      <nav class="view-tabs" aria-label="Equipment views">
+        <button class="view-tab is-active" type="button" data-view="map" aria-current="page">Facility map</button>
+        <button class="view-tab" type="button" data-view="list">Equipment list</button>
+        <button class="view-tab" type="button" data-view="attention">Attention <span id="attention-tab-count" class="tab-count">0</span></button>
+      </nav>
       <div class="header-meta">
-        <span class="manual-data"><span aria-hidden="true">●</span> Manually maintained · not live</span>
+        <span class="manual-data" title="Status is manually maintained and is not a live REES reading or alarm."><span aria-hidden="true">●</span> Manually maintained · not live</span>
         <p id="data-updated">Most recent review: loading…</p>
       </div>
     </div>
   </header>
 
   <main id="main-content" class="page-shell">
-    <section class="summary-section" aria-labelledby="overview-heading">
-      <div class="section-heading">
-        <div>
-          <p class="eyebrow">Facility overview</p>
-          <h2 id="overview-heading">Equipment status</h2>
-        </div>
-        <p class="summary-caption">Counts include active inventory records only.</p>
-      </div>
-      <div class="summary-grid" id="summary-cards"></div>
-    </section>
-
-    <div class="notice" role="note">
-      <span class="notice-icon" aria-hidden="true">i</span>
-      <p>Situational awareness only. Status is manually maintained and is not a live REES reading or alarm. Follow approved systems and procedures for monitoring, alarm response, maintenance, and equipment records.</p>
-    </div>
-
-    <nav class="view-tabs" aria-label="Equipment views">
-      <button class="view-tab is-active" type="button" data-view="map" aria-current="page">Facility map</button>
-      <button class="view-tab" type="button" data-view="list">Equipment list</button>
-      <button class="view-tab" type="button" data-view="attention">Attention <span id="attention-tab-count" class="tab-count">0</span></button>
-    </nav>
-
-    <section class="view-panel" id="view-map" aria-labelledby="map-heading">
-      <div class="section-heading view-heading">
-        <div>
-          <p class="eyebrow">Physical locations / FF4820</p>
-          <h2 id="map-heading">FF4820 facility map</h2>
-          <p class="muted">Numbered positions follow the facility map in the equipment register. Spaces 30–32 appear in neighboring rooms on that source map.</p>
-        </div>
-        <div class="type-legend" aria-label="Map marker shape identifies equipment type">
-          <span><i class="type-dot incubator"></i>Incubator</span>
-          <span><i class="type-dot freezer"></i>Freezer</span>
-          <span><i class="type-dot refrigerator"></i>Refrigerator</span>
-        </div>
-      </div>
-      <div class="map-workspace">
-        <div class="map-column">
-          <div class="map-status-legend" aria-label="Map marker legend">
-            <span><i class="status-key status-key-operational" aria-hidden="true"></i>Operational</span>
-            <span><i class="status-key status-key-attention" aria-hidden="true"></i>Attention / maintenance</span>
-            <span><i class="status-key status-key-unavailable" aria-hidden="true"></i>Out of service</span>
-            <span><i class="status-key status-key-unknown" aria-hidden="true"></i>Unknown / retired</span>
-            <span><i class="status-key status-key-monitoring-connected" aria-hidden="true"></i>Monitoring connected</span>
-            <span><i class="status-key status-key-monitoring-exception" aria-hidden="true"></i>Monitoring exception</span>
-            <span><i class="status-key status-key-monitoring-unknown" aria-hidden="true"></i>Monitoring unknown</span>
-            <span><i class="status-key status-key-monitoring-none" aria-hidden="true"></i>Not monitored</span>
-            <span class="muted">Select a space marker for record details.</span>
-          </div>
-          <div class="map-wrap">
-            <div class="map-viewport" tabindex="0" aria-label="Scrollable facility map. All equipment is also available in the equipment index.">
-              <div class="map-canvas" id="map-canvas" role="group" aria-label="FF4820 facility map with equipment positions">
-                <img class="facility-map-image" src="images/ff4820-facility-map.png" alt="" draggable="false">
-                <div class="map-markers" id="map-markers"></div>
-              </div>
-            </div>
-          </div>
-          <p class="map-footnote">Map source: FF4820 Map.xlsx. Positions reflect numbered locations in that reference; verify location in the room before relying on it for navigation.</p>
-          <p class="map-footnote map-mobile-hint">On smaller screens, swipe the map horizontally or use the complete equipment index below it.</p>
-        </div>
-        <aside class="map-index" aria-labelledby="map-index-heading">
-          <div class="map-index-header">
-            <div>
-              <p class="eyebrow">Equipment index</p>
-              <h3 id="map-index-heading">Status by space</h3>
-            </div>
-            <span class="map-index-count" id="map-index-count"></span>
-          </div>
+    <section class="view-panel map-panel" id="view-map" aria-label="FF4820 facility map">
+      <div class="map-stage">
+        <div class="map-toolbar">
+          <p class="readiness" id="readiness-summary" aria-live="polite"></p>
+          <div class="status-filters" id="status-filters" role="group" aria-label="Filter map by status"></div>
           <label class="map-search">
-            <span class="visually-hidden">Search mapped equipment</span>
-            <input id="map-search" type="search" placeholder="Search unit or purpose" autocomplete="off">
+            <span class="visually-hidden">Search map by unit, space, type, or purpose</span>
+            <input id="map-search" type="search" placeholder="Find unit, space or purpose" autocomplete="off">
           </label>
-          <p class="map-index-empty" id="map-index-empty" hidden>No equipment matches this search.</p>
-          <div class="map-index-list" id="map-equipment-list" aria-label="Mapped equipment and status"></div>
-        </aside>
+        </div>
+        <div class="map-viewport" tabindex="0" aria-label="Scrollable facility map">
+          <div class="map-canvas" id="map-canvas" role="group" aria-label="FF4820 facility map with equipment positions">
+            <img class="facility-map-image" src="images/ff4820-facility-map.png" alt="" draggable="false">
+            <div class="map-markers" id="map-markers"></div>
+            <div class="map-popup" id="map-popup" role="tooltip" hidden></div>
+            <p class="map-empty" id="map-empty" hidden>No equipment matches the current search and status filters.</p>
+          </div>
+        </div>
+        <div class="map-foot">
+          <div class="type-legend" aria-label="Marker shape identifies equipment type">
+            <span><i class="type-dot incubator"></i>Incubator</span>
+            <span><i class="type-dot freezer"></i>Freezer</span>
+            <span><i class="type-dot refrigerator"></i>Refrigerator</span>
+          </div>
+          <p class="map-footnote">Hover or focus a marker for status; select it for full details. Positions follow the numbered facility map in FF4820 Map.xlsx (spaces 30–32 are in neighboring rooms on that map); confirm in the room.</p>
+        </div>
       </div>
     </section>
 
@@ -180,19 +137,18 @@
       </div>
     </section>
 
-    <section class="legend-panel" aria-labelledby="legend-heading">
-      <div class="legend-title">
-        <p class="eyebrow">Reading this dashboard</p>
-        <h2 id="legend-heading">Status &amp; data legend</h2>
-      </div>
+    <details class="legend-panel">
+      <summary>Status key and data notes</summary>
       <div class="legend-content">
-        <div><strong>Equipment type</strong><p>Type labels and restrained tile accents distinguish incubators, freezers, and refrigerators.</p></div>
-        <div><strong>Operational status</strong><p>Plain-language label and icon indicate a manually maintained status. Unknown means the source did not provide a confirmed current status.</p></div>
-        <div><strong>Monitoring status</strong><p>Shown separately from operational status. It is not a live REES connection or measurement.</p></div>
-        <div><strong>Last updated</strong><p>The most recent populated record review date. Blank dates are shown as “Not provided.”</p></div>
-        <div class="legend-wide"><strong>Setpoints are targets</strong><p>Temperature and humidity are target conditions from the equipment register, not current measured readings.</p></div>
+        <div><strong><i class="tone-swatch tone-green"></i>Available</strong><p>Operational. Confirmed ready to use.</p></div>
+        <div><strong><i class="tone-swatch tone-blue"></i>Reserved / in use</strong><p>Reserved or currently in use.</p></div>
+        <div><strong><i class="tone-swatch tone-yellow"></i>Attention</strong><p>Maintenance scheduled, inspection required, or attention needed.</p></div>
+        <div><strong><i class="tone-swatch tone-orange"></i>Limited</strong><p>Calibration due, limited availability, or monitoring disconnected.</p></div>
+        <div><strong><i class="tone-swatch tone-red"></i>Unavailable</strong><p>Out of service, under maintenance, or temporarily unavailable.</p></div>
+        <div><strong><i class="tone-swatch tone-neutral"></i>Not confirmed</strong><p>No confirmed status in the source data. Never assumed to be available.</p></div>
+        <div class="legend-wide"><strong>About this data</strong><p>Situational awareness only. Status is manually maintained and is not a live REES reading or alarm; follow approved systems and procedures for monitoring, alarm response, maintenance, and equipment records. Setpoints are target conditions, not measurements.</p></div>
       </div>
-    </section>
+    </details>
 
     <footer class="site-footer">
       <span>Static dashboard · no live integrations</span>

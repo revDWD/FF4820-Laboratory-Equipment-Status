@@ -23,7 +23,7 @@ The app uses semantic HTML, CSS, and dependency-free browser JavaScript. `app.js
 
 `StaticEquipmentProvider` and `StaticStatusProvider` load local published data. REES and Maintenance Connection provider placeholders are disabled and must not make network calls. Any future connector needs explicit audience, security, source-of-truth, access, and read-only approvals; keep the static experience useful without integrations.
 
-Maintain the existing three views: facility map, searchable/filterable equipment list, and attention queue. Keep summary counts data-derived. Show separate operational and monitoring status indicators on map markers and readable status labels in the equipment index. Preserve keyboard access, visible focus, status text plus icon and styling, tablet/mobile list access, reduced-motion support, useful loading errors, and print styles.
+Maintain the existing three views: facility map, searchable/filterable equipment list, and attention queue. The map sits directly under the header and is the focal view; do not add a banner or a duplicate equipment index beneath it. Keep readiness counts data-derived. Markers are colored by status tone (`statusTones`), with a hover/focus popup for details and a monitoring-alert badge. Preserve keyboard access, visible focus, status text plus color, tablet/mobile list access, reduced-motion support, useful loading errors, and print styles.
 
 ## Safe data updates
 

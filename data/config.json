@@ -1,15 +1,36 @@
 {
   "operationalStatuses": [
     "Operational",
-    "Attention Needed",
-    "Out of Service",
-    "Under Maintenance",
+    "In Use",
     "Reserved",
-    "Temporarily Unavailable",
+    "Maintenance Scheduled",
+    "Inspection Required",
+    "Attention Needed",
+    "Calibration Due",
+    "Limited Availability",
     "Monitoring Disconnected",
+    "Under Maintenance",
+    "Temporarily Unavailable",
+    "Out of Service",
     "Retired",
     "Unknown"
   ],
+  "statusTones": {
+    "Operational": "green",
+    "In Use": "blue",
+    "Reserved": "blue",
+    "Maintenance Scheduled": "yellow",
+    "Inspection Required": "yellow",
+    "Attention Needed": "yellow",
+    "Calibration Due": "orange",
+    "Limited Availability": "orange",
+    "Monitoring Disconnected": "orange",
+    "Under Maintenance": "red",
+    "Temporarily Unavailable": "red",
+    "Out of Service": "red",
+    "Retired": "neutral",
+    "Unknown": "neutral"
+  },
   "monitoringStatuses": [
     "Connected",
     "Alarm",
@@ -22,12 +43,17 @@
     "Out of Service",
     "Under Maintenance",
     "Reserved",
+    "In Use",
     "Temporarily Unavailable"
   ],
   "attentionStatuses": [
     "Out of Service",
     "Under Maintenance",
     "Attention Needed",
+    "Maintenance Scheduled",
+    "Inspection Required",
+    "Calibration Due",
+    "Limited Availability",
     "Temporarily Unavailable",
     "Monitoring Disconnected"
   ],

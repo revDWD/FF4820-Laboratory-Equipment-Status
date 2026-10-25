@@ -31,7 +31,9 @@ The editable source is `data/equipment.csv`. Keep the header names and order unc
 
 ### Operational status
 
-`Operational`, `Attention Needed`, `Out of Service`, `Under Maintenance`, `Reserved`, `Temporarily Unavailable`, `Monitoring Disconnected`, `Retired`, `Unknown`.
+`Operational`, `In Use`, `Reserved`, `Maintenance Scheduled`, `Inspection Required`, `Attention Needed`, `Calibration Due`, `Limited Availability`, `Monitoring Disconnected`, `Under Maintenance`, `Temporarily Unavailable`, `Out of Service`, `Retired`, `Unknown`.
+
+Each status maps to a map color in `statusTones` (`data/config.json`): green = Operational; blue = In Use, Reserved; yellow = Maintenance Scheduled, Inspection Required, Attention Needed; orange = Calibration Due, Limited Availability, Monitoring Disconnected; red = Under Maintenance, Temporarily Unavailable, Out of Service; neutral gray (dashed) = Retired, Unknown. The validator requires every status to have a tone.
 
 ### Monitoring status
 

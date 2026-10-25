@@ -92,6 +92,13 @@ class EquipmentDataValidationTests(unittest.TestCase):
         path.write_text(json.dumps(layout), encoding="utf-8")
         self.assertTrue(any("background dimensions do not match" in error for error in self.errors()))
 
+    def test_status_without_color_tone_is_reported(self):
+        path = self.root / "data" / "config.json"
+        config = json.loads(path.read_text(encoding="utf-8"))
+        del config["statusTones"]["Calibration Due"]
+        path.write_text(json.dumps(config), encoding="utf-8")
+        self.assertTrue(any("Calibration Due" in error and "statusTones" in error for error in self.errors()))
+
     def test_unsafe_reference_is_reported(self):
         fields, records = self.read_records()
         records[0]["reesReference"] = "javascript:alert(1)"

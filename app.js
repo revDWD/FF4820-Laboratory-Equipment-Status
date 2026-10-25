@@ -41,30 +41,23 @@ const text = (value) => value === undefined || value === null || value === "" ? 
 const cleanDate = (value) => value && /^\d{4}-\d{2}-\d{2}$/.test(value) ? value : "";
 const slug = (value) => String(value).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 
-const STATUS_ICONS = {
-  "Operational": "✓",
-  "Attention Needed": "!",
-  "Out of Service": "×",
-  "Under Maintenance": "⚒",
-  "Reserved": "▣",
-  "Temporarily Unavailable": "–",
-  "Monitoring Disconnected": "⌁",
-  "Retired": "○",
-  "Unknown": "?"
-};
-const MONITOR_ICONS = {
-  "Connected": "✓",
-  "Alarm": "!",
-  "Inhibited": "⊘",
-  "Disconnected": "×",
-  "Not Monitored": "—",
-  "Unknown": "?"
-};
+const TONES = [
+  { id: "green", label: "Available" },
+  { id: "blue", label: "Reserved / in use" },
+  { id: "yellow", label: "Attention" },
+  { id: "orange", label: "Limited" },
+  { id: "red", label: "Unavailable" },
+  { id: "neutral", label: "Not confirmed" }
+];
+const toneLabel = (tone) => TONES.find((entry) => entry.id === tone)?.label || "Not confirmed";
+const toneOf = (status) => config?.statusTones?.[status] || "neutral";
+const MONITOR_ALERTS = ["Alarm", "Inhibited", "Disconnected"];
 
 let equipment = [];
 let config = null;
 let layout = null;
 let returnFocus = null;
+const activeTones = new Set();
 
 function parseCsv(source) {
   const rows = [];
@@ -119,16 +112,14 @@ function isActive(record) {
 
 function statusChip(value, monitoring = false) {
   const label = text(value);
-  const icon = (monitoring ? MONITOR_ICONS : STATUS_ICONS)[label] || "?";
   const chip = document.createElement("span");
-  chip.className = `status-chip ${monitoring ? `monitor-${slug(label)}` : `status-${slug(label)}`}`;
-  const symbol = document.createElement("span");
-  symbol.className = "status-icon";
-  symbol.setAttribute("aria-hidden", "true");
-  symbol.textContent = icon;
+  chip.className = `status-chip ${monitoring ? `monitor-${slug(label)}` : `tone-${toneOf(label)}`}`;
+  const dot = document.createElement("span");
+  dot.className = "status-dot";
+  dot.setAttribute("aria-hidden", "true");
   const words = document.createElement("span");
-  words.textContent = label;
-  chip.append(symbol, words);
+  words.textContent = monitoring ? `Monitoring: ${label}` : label;
+  chip.append(dot, words);
   return chip;
 }
 
@@ -154,36 +145,47 @@ function attentionReason(record) {
   return [...new Set(reasons)];
 }
 
-function makeSummaryCard(label, value, hint, className = "") {
-  const card = document.createElement("div");
-  card.className = `summary-card ${className}`.trim();
-  const title = document.createElement("span");
-  title.className = "summary-label";
-  title.textContent = label;
-  const count = document.createElement("span");
-  count.className = "summary-value";
-  count.textContent = String(value);
-  const detail = document.createElement("span");
-  detail.className = "summary-hint";
-  detail.textContent = hint;
-  card.append(title, count, detail);
-  return card;
-}
-
-function renderSummary(records) {
+function renderReadiness(records) {
   const active = records.filter(isActive);
-  const unavailableCount = active.filter((record) => config.unavailableStatuses.includes(record.operationalStatus)).length;
-  const attentionCount = active.filter((record) => record.operationalStatus === "Attention Needed").length;
-  const monitorCount = active.filter((record) => config.monitoringExceptions.includes(record.monitoringStatus)).length;
-  const reviewCount = active.filter(needsReview).length;
-  $("#summary-cards").replaceChildren(
-    makeSummaryCard("Total equipment", active.length, "Active inventory"),
-    makeSummaryCard("Operational", active.filter((record) => record.operationalStatus === "Operational").length, "Confirmed operating normally"),
-    makeSummaryCard("Unavailable", unavailableCount, "Out of service, maintenance, reserved or unavailable", unavailableCount ? "is-danger" : ""),
-    makeSummaryCard("Attention needed", attentionCount, "Operational status requires action", attentionCount ? "is-warning" : ""),
-    makeSummaryCard("Monitoring exceptions", monitorCount, "Alarm, inhibited, disconnected or unknown", monitorCount ? "is-warning" : ""),
-    makeSummaryCard("Records needing review", reviewCount, "Missing or unknown current information", reviewCount ? "is-warning" : "")
-  );
+  const counts = new Map(TONES.map((tone) => [tone.id, 0]));
+  for (const record of active) counts.set(toneOf(record.operationalStatus), counts.get(toneOf(record.operationalStatus)) + 1);
+  const available = counts.get("green");
+  const unconfirmed = counts.get("neutral");
+  $("#readiness-summary").replaceChildren();
+  const headline = document.createElement("strong");
+  headline.textContent = `${available} of ${active.length} available`;
+  const detail = document.createElement("span");
+  detail.textContent = unconfirmed === active.length
+    ? "Current status not yet confirmed for any unit"
+    : unconfirmed ? `${unconfirmed} not confirmed` : "All statuses confirmed";
+  $("#readiness-summary").append(headline, detail);
+
+  const group = $("#status-filters");
+  group.replaceChildren();
+  for (const tone of TONES) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `status-filter tone-${tone.id}`;
+    button.dataset.tone = tone.id;
+    button.setAttribute("aria-pressed", String(activeTones.has(tone.id)));
+    const dot = document.createElement("span");
+    dot.className = "status-dot";
+    dot.setAttribute("aria-hidden", "true");
+    const label = document.createElement("span");
+    label.textContent = tone.label;
+    const count = document.createElement("span");
+    count.className = "status-count";
+    count.textContent = String(counts.get(tone.id));
+    button.append(dot, label, count);
+    button.disabled = counts.get(tone.id) === 0;
+    button.addEventListener("click", () => {
+      if (activeTones.has(tone.id)) activeTones.delete(tone.id);
+      else activeTones.add(tone.id);
+      button.setAttribute("aria-pressed", String(activeTones.has(tone.id)));
+      applyMapFilters();
+    });
+    group.append(button);
+  }
   $("#data-updated").textContent = dataUpdatedLabel(active);
 }
 
@@ -192,99 +194,95 @@ function equipmentById() {
 }
 
 function createEquipmentButton(record, position) {
+  const tone = toneOf(record.operationalStatus);
   const button = document.createElement("button");
   button.type = "button";
-  button.className = `map-marker type-${slug(record.unitType)} status-${slug(record.operationalStatus)}`;
-  button.classList.add(`monitor-${slug(record.monitoringStatus)}`);
+  button.className = `map-marker type-${slug(record.unitType)} tone-${tone}`;
+  if (MONITOR_ALERTS.includes(record.monitoringStatus)) button.classList.add("has-monitor-alert");
   button.dataset.unitId = record.unitId;
+  button.dataset.tone = tone;
   button.style.left = `${position.x / 10}%`;
   button.style.top = `${position.y / 10}%`;
-  button.title = `${record.unitId} · Space ${record.spaceNumber} · Operational: ${record.operationalStatus} · Monitoring: ${record.monitoringStatus}`;
   button.setAttribute(
     "aria-label",
-    `${record.unitId}, space ${record.spaceNumber}, ${record.unitType}. Operational status: ${record.operationalStatus}. Monitoring status: ${record.monitoringStatus}. Open details.`
+    `${record.unitId}, space ${record.spaceNumber}, ${record.unitType}. ${toneLabel(tone)}: ${record.operationalStatus}. Monitoring: ${record.monitoringStatus}. Open details.`
   );
   const space = document.createElement("span");
   space.className = "marker-space";
   space.textContent = record.spaceNumber;
-  const operational = document.createElement("span");
-  operational.className = "marker-operational";
-  operational.setAttribute("aria-hidden", "true");
-  operational.textContent = STATUS_ICONS[record.operationalStatus] || "?";
-  const monitoring = document.createElement("span");
-  monitoring.className = "marker-monitoring";
-  monitoring.setAttribute("aria-hidden", "true");
-  monitoring.textContent = MONITOR_ICONS[record.monitoringStatus] || "?";
-  button.append(space, operational, monitoring);
-  button.addEventListener("click", () => openDetails(record, button));
+  button.append(space);
+  button.addEventListener("mouseenter", () => showPopup(record, position));
+  button.addEventListener("focus", () => showPopup(record, position));
+  button.addEventListener("mouseleave", hidePopup);
+  button.addEventListener("blur", hidePopup);
+  button.addEventListener("click", () => {
+    hidePopup();
+    openDetails(record, button);
+  });
   return button;
 }
 
-function createMapIndexItem(record) {
-  const button = document.createElement("button");
-  button.className = "map-index-item";
-  button.type = "button";
-  button.dataset.unitId = record.unitId;
-  button.setAttribute("aria-label", `${record.unitId}, space ${record.spaceNumber}, ${record.unitType}. Operational: ${record.operationalStatus}. Monitoring: ${record.monitoringStatus}. Open details.`);
-
-  const location = document.createElement("span");
-  location.className = "map-index-location";
-  location.textContent = `SPACE ${record.spaceNumber} · ${record.unitType.toUpperCase()}`;
-
-  const id = document.createElement("strong");
-  id.className = "map-index-unit";
-  id.textContent = record.unitId;
-
-  const purpose = document.createElement("span");
-  purpose.className = "map-index-purpose";
-  purpose.textContent = record.purpose;
-
+function showPopup(record, position) {
+  const popup = $("#map-popup");
+  const tone = toneOf(record.operationalStatus);
+  const title = document.createElement("strong");
+  title.className = "popup-title";
+  title.textContent = record.unitId;
+  const meta = document.createElement("span");
+  meta.className = "popup-meta";
+  meta.textContent = `Space ${record.spaceNumber} · ${record.unitType} · ${text(record.purpose)}`;
+  const availability = document.createElement("span");
+  availability.className = `popup-availability tone-${tone}`;
+  availability.textContent = toneLabel(tone);
   const statuses = document.createElement("span");
-  statuses.className = "map-index-statuses";
+  statuses.className = "popup-statuses";
   statuses.append(statusChip(record.operationalStatus), statusChip(record.monitoringStatus, true));
+  const reviewed = document.createElement("span");
+  reviewed.className = "popup-meta";
+  reviewed.textContent = `Last reviewed: ${formatDate(record.lastUpdated)}`;
+  const hint = document.createElement("span");
+  hint.className = "popup-hint";
+  hint.textContent = "Select for full details";
+  popup.replaceChildren(title, meta, availability, statuses, reviewed, hint);
+  const horizontal = position.x > 780 ? "-100%" : position.x < 140 ? "-12%" : "-50%";
+  const below = position.y < 330;
+  popup.style.left = `${position.x / 10}%`;
+  popup.style.top = `${position.y / 10}%`;
+  popup.style.transform = `translate(${horizontal}, ${below ? "calc(var(--marker) / 2 + 10px)" : "calc(-100% - var(--marker) / 2 - 10px)"})`;
+  popup.hidden = false;
+}
 
-  button.append(location, id, purpose, statuses);
-  button.addEventListener("click", () => openDetails(record, button));
-  return button;
+function hidePopup() {
+  $("#map-popup").hidden = true;
 }
 
 function renderMap() {
   const byId = equipmentById();
   const markers = $("#map-markers");
-  const index = $("#map-equipment-list");
   markers.replaceChildren();
-  index.replaceChildren();
-  const activeLayout = layout.equipment.filter((position) => {
+  for (const position of layout.equipment) {
     const record = byId.get(position.unitId);
-    return record && isActive(record);
-  });
-  for (const position of activeLayout) {
-    const record = byId.get(position.unitId);
-    markers.append(createEquipmentButton(record, position));
-    index.append(createMapIndexItem(record));
+    if (record && isActive(record)) markers.append(createEquipmentButton(record, position));
   }
-  $("#map-index-count").textContent = `${activeLayout.length} units`;
-  renderMapSearch();
+  applyMapFilters();
 }
 
-function renderMapSearch() {
+function applyMapFilters() {
   const query = $("#map-search").value.trim().toLowerCase();
-  let visibleCount = 0;
-  for (const item of $$(".map-index-item")) {
-    const record = equipment.find((entry) => entry.unitId === item.dataset.unitId);
-    const matches = !query || [
-      record.unitId,
-      record.spaceNumber,
-      record.unitType,
-      record.purpose
-    ].join(" ").toLowerCase().includes(query);
-    item.hidden = !matches;
-    const marker = $$(".map-marker").find((entry) => entry.dataset.unitId === record.unitId);
-    if (marker) marker.classList.toggle("is-muted", !matches);
-    if (matches) visibleCount += 1;
+  const byId = equipmentById();
+  let matches = 0;
+  const markers = $$(".map-marker");
+  for (const marker of markers) {
+    const record = byId.get(marker.dataset.unitId);
+    const toneMatch = !activeTones.size || activeTones.has(marker.dataset.tone);
+    const textMatch = !query || [record.unitId, record.spaceNumber, record.unitType, record.purpose, record.operationalStatus]
+      .join(" ").toLowerCase().includes(query);
+    const matched = toneMatch && textMatch;
+    marker.classList.toggle("is-muted", !matched);
+    if (matched) matches += 1;
   }
-  $("#map-index-count").textContent = `${visibleCount} of ${equipment.filter(isActive).length}`;
-  $("#map-index-empty").hidden = visibleCount > 0;
+  $("#map-empty").hidden = matches > 0;
+  $("#map-canvas").classList.toggle("is-filtered", Boolean(query) || activeTones.size > 0);
 }
 
 function formatDate(value) {
@@ -439,7 +437,7 @@ function addDetailSection(root, title, fields) {
 
 function openDetails(record, trigger) {
   returnFocus = trigger;
-  $("#equipment-dialog").classList.toggle("is-out-of-service", record.operationalStatus === "Out of Service");
+  $("#equipment-dialog").classList.toggle("is-out-of-service", toneOf(record.operationalStatus) === "red");
   $("#detail-title").textContent = record.unitId;
   $("#detail-kicker").textContent = `${record.unitType} · Space ${record.spaceNumber}`;
   const content = $("#detail-content");
@@ -592,12 +590,12 @@ async function initialize() {
     config = loadedConfig;
     layout = loadedLayout;
     validateLoadedData();
-    renderSummary(equipment);
+    renderReadiness(equipment);
     renderMap();
     fillFilters();
     renderTable();
     renderAttention();
-    $("#map-search").addEventListener("input", renderMapSearch);
+    $("#map-search").addEventListener("input", applyMapFilters);
     $("#detail-close").addEventListener("click", () => $("#equipment-dialog").close());
     $("#equipment-dialog").addEventListener("close", () => {
       if (returnFocus?.isConnected) returnFocus.focus();
